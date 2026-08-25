@@ -1,0 +1,9 @@
+close all
+open 1crn
+molcompose style clean-cartoon model #1
+close all
+open 1brs
+molcompose style complex-by-chain model #1
+molcompose interface A D model #1 distance 4.5
+molcompose style interface-focus model #1
+molcompose export /private/tmp/molcompose-smoke.png width 2400 height 1800 supersample 3 transparent false saveSession true overwrite true

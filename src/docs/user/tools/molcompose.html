@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MolCompose</title>
+</head>
+<body>
+<h1>MolCompose tool</h1>
+
+<p>MolCompose is a dockable side panel (menu: <b>Tools &rarr; Structure Analysis &rarr;
+MolCompose</b>) for analysing protein&ndash;protein interfaces and composing
+reproducible, publication-oriented figures of them. Open structures first with
+native ChimeraX functionality (<code>open 1brs</code> or
+File&nbsp;&rarr;&nbsp;Open); MolCompose never opens files itself and never
+changes coordinates, residue numbering, chain IDs, or source files.</p>
+
+<p>Every button runs a canonical
+<a href="../commands/molcompose.html">molcompose command</a> that is recorded
+in the ChimeraX Log, so any figure can be reproduced from the Log alone.</p>
+
+<h2>Tabs</h2>
+
+<p>The panel has four tabs: <b>Compose</b>, <b>Interface</b>, <b>Export</b> and
+<b>Agent</b>.</p>
+
+<p><img src="molcompose-panel.png" alt="The four tabs of the MolCompose panel"
+style="max-width: 100%; border: 1px solid #ddd;"></p>
+<p style="color: #666; font-size: 90%;">The top of each tab, on a designed
+binder and its predicted complex: the chain lists, counts and metrics shown are
+the ones those structures produce, and the Agent tab is one turn that ran. Each
+tab scrolls past what is visible here.</p>
+
+<h3>Compose</h3>
+<ul>
+<li><b>Structure</b> &mdash; selects among open atomic models and shows the
+model name, ID, and protein-chain count. The selector follows models opened
+and closed natively.</li>
+<li><b>Style</b> &mdash; a publication preset, applied with <b>Apply Style</b>.
+Presets come in two groups: whole-structure ones (<i>Cartoon</i>, <i>Cartoon
+(chain colours)</i>, <i>Cartoon (pLDDT confidence)</i>, <i>Surface (chain
+colours)</i>&hellip;) and interface ones (<i>Interface (partners)</i>,
+<i>Interface close-up</i>, <i>Interface (epitope on surface)</i>&hellip;),
+which need a detected interface. The same card colours residues by a
+per-residue metric &mdash; <b>pLDDT</b> or <b>B-factor</b> &mdash; and
+overrides a single chain's colour.</li>
+<li><b>Available metrics</b> &mdash; <b>Check this structure</b> reports which
+measurements this model supports and where its provenance came from.</li>
+<li><b>View</b> &mdash; <b>Fit View</b>, <b>Rotate</b>, and the two interface
+viewpoints <b>Face on</b> and <b>Open book</b>; shortcuts to the native
+Sequence, Distances, Render/Select by Attribute and Model panels; and <b>Reset
+Appearance</b>.</li>
+<li><b>Sequence colouring</b> &mdash; writes the current per-residue colouring
+as an SCF file and opens it in the ChimeraX Sequence Viewer, where the extent
+of an interface, or a stretch of low confidence, is a shape rather than a
+scatter of highlighted residues. <b>Save SCF file&hellip;</b> keeps the
+file.</li>
+</ul>
+
+<h3>Interface</h3>
+<ul>
+<li><b>Detect interface</b> &mdash; <b>Group A</b> and <b>Group B</b> chain lists
+(multi-selection), the contact criterion (<i>Heavy atoms</i>, <i>C&beta;&ndash;C&beta;
+(Gly: C&alpha;)</i> or <i>VDW overlap</i>) and its cutoff, which defaults to
+heavy atoms at 4.5&nbsp;&Aring;. <b>Characterise Interface</b> runs the whole
+analysis in one pass; <b>Detect Only</b> stops after the residue lists, and
+<b>Scan All Pairs</b> reports every contacting chain pair in the model.</li>
+<li><b>Results</b> &mdash; contacts, interface residues, buried area, predicted
+&Delta;G and K<sub>d</sub>, DockQ against a reference, and the prediction
+confidence measures (pDockQ, pDockQ2, ipTM, ipSAE, LIS, ipLDDT, pTM, mean PAE,
+mean pLDDT). Each tile has a tooltip giving the definition the number was
+measured under. Typed interactions are listed as counts, and interface residues
+by predicted &Delta;&Delta;G where that has been loaded. <b>Copy Results</b>
+puts the lot on the clipboard, and <b>Compare with</b> plus <em>DockQ</em> scores
+the model against an open or browsed reference structure.</li>
+<li><b>Files</b> &mdash; finds a prediction's own confidence files (PAE matrix,
+summary metrics) beside the model, for AlphaFold 3, AlphaFold Server, Boltz-2,
+Protenix, AlphaFold2-Multimer, Chai-1, ColabFold and the AlphaFold DB, or takes
+a path with <b>Choose PAE file&hellip;</b>. <b>Load &Delta;&Delta;G&hellip;</b>
+reads a predicted mutation scan &mdash; a CSV or TSV carrying a residue
+position, a mutant residue and a value, Pythia's own mask output, or a
+PythiaStudio workbook; other predictors need reshaping into that first, and
+the <a href="../commands/molcompose.html">command page</a> gives the exact
+column names &mdash; after which <b>Colour by &Delta;&Delta;G</b>
+and <b>Colour by &Delta;SASA</b> paint the structure. <b>Load gmx_MMPBSA&hellip;</b>
+reads <code>gmx_MMPBSA</code>'s per-residue decomposition — what each residue
+contributes to binding — and asks which of the file's chains is which of the
+structure's, because GROMACS usually renames them. Its values are negative
+where a residue is favourable, the opposite sign to &Delta;&Delta;G, and it is
+not the interface's &Delta;G: these totals are not comparable with the
+predicted &Delta;G in <b>Results</b>.</p>
+<p><code>gmx_MMPBSA</code> is the program's name, and it writes
+<code>FINAL_DECOMP_MMPBSA.dat</code> whichever solvation model was run — so
+the file name does not say which method produced the numbers. Generalized Born
+is <em>MM/GBSA</em> and Poisson&ndash;Boltzmann is <em>MM/PBSA</em>; they are
+different methods and disagree by several kcal/mol. A run configured for both
+writes the decomposition twice, and MolCompose asks which to read rather than
+taking whichever came first. The colour key and the hot-spot ranking are then
+labelled with the method that was actually used. <b>Load RMSF&hellip;</b> reads
+<code>gmx rmsf -res</code> output — how much each residue moves over the
+trajectory — and asks which chains the file's blocks are, because
+<code>gmx</code> restarts its numbering at each one. Fluctuation is not a
+contribution: a residue that moves a great deal may be a loop nowhere near the
+interface.
+<p><em>MD repairs the structure before it runs, so load the repaired PDB
+rather than the deposited entry</em> — otherwise the residues do not line up.
+RMSF refuses to load when the counts disagree; a decomposition whose residue
+names happen to match would load onto the wrong residues without
+complaining.</p></li>
+<li><b>Blocks</b> &mdash; detection divides the complex into four named
+ChimeraX selections (group A and B chains, and the interface residues on each
+side), so they can be selected, recoloured and named in a command.</li>
+<li><b>Interface figure</b> &mdash; <b>Show Interface Figure</b> and
+<b>Hot-spot Figure</b> build the figure, the latter ranking by buried area
+or, once a decomposition is loaded, by contribution to binding, with the group colours, an optional
+semi-transparent interface surface, and a residue-label count that can override
+the preset. <b>H-bonds</b> and <b>Contacts</b> add typed interactions.</li>
+</ul>
+
+<h3>Export</h3>
+<ul>
+<li><b>Publication image</b> &mdash; a print size in millimetres and a
+resolution in dpi, or pixels directly; <b>Match window</b> takes the current
+viewport's aspect. <b>Colour key font</b> is in pixels of the exported image rather than
+points, so the panel shows what it works out as at the dpi chosen above — a
+figure printed at one column needs a larger number than the same figure across
+two. <b>Export Image</b> writes PNG or TIFF with the resolution
+stamped into the file, optionally with the ChimeraX session (.cxs) and the
+command recipe (.cxc) beside it.</li>
+<li><b>Interface report</b> &mdash; <b>Write Report&hellip;</b> produces one
+file with the full characterisation: geometry, typed interactions, buried area,
+predicted &Delta;G/K<sub>d</sub>, confidence, an auto-written Methods
+paragraph, and the command recipe.</li>
+</ul>
+
+<h3>Agent</h3>
+<p>The Agent tab exposes the same validated commands to an AI agent in two
+ways. Both need the bridge started from that tab
+(<code>remotecontrol rest</code>) and the <code>molcompose-mcp</code> server
+installed (<code>pip install molcompose-mcp</code>).</p>
+<ul>
+<li><b>Ask in this window</b> &mdash; appears when an agent CLI
+(<code>claude</code> or <code>codex</code>) is found on your PATH, or when you
+point the panel at one. It runs <i>your</i> already-signed-in CLI as a
+subprocess and points it at this session, so everything stays in one window.
+MolCompose never embeds a language model and never stores an API key; the
+command it runs is printed in the chat log, and so is every MolCompose command
+the turn issued.</li>
+<li><b>Use your own client</b> &mdash; register the MCP server in Claude Code,
+Claude Desktop, Codex, Cursor or any other MCP client. MCP is an open protocol,
+so this is not tied to one vendor, and a command-line client is enough.
+<b>Setup prompt &mdash; hand the setup to an agent</b> folds open a paragraph written for an agent rather than for
+you: paste it into any MCP-capable client that can run commands and it will do
+the installation, the registration and a first analysis to check the result. It
+names the port the bridge is actually on, so it stays right when ChimeraX is
+listening somewhere other than 3000.</li>
+</ul>
+<p>An agent reaches MolCompose through the same validated, logged commands as
+the buttons in this panel, plus a small allow-list of display-only native
+commands, and the panel reports the operations it verified rather than the
+agent's account of them. Every figure it exports carries the full command
+recipe and an agent-provenance record.</p>
+<p>While the bridge is running, ChimeraX accepts commands on 127.0.0.1 without
+authentication &mdash; from the agent and from anything else on this computer.
+That is a property of ChimeraX's REST control rather than of MolCompose, and
+nothing in this tool changes it, so stop the bridge when you are not using
+it.</p>
+
+<h2>Five-minute workflow</h2>
+<ol>
+<li><code>open 1brs</code></li>
+<li>Pick the model in <b>Structure</b>, on the <b>Compose</b> tab.</li>
+<li>Apply <b>Cartoon (chain colours)</b>.</li>
+<li>On the <b>Interface</b> tab, select chain A in <b>Group A</b> and chain D
+in <b>Group B</b>, then <b>Characterise Interface</b>.</li>
+<li>Read the numbers in <b>Results</b>, then <b>Show Interface Figure</b> and
+adjust the camera with normal ChimeraX mouse controls if desired.</li>
+<li>On the <b>Export</b> tab, set the print size and <b>Export Image</b>
+&mdash; optionally with the session and the command recipe.</li>
+</ol>
+
+<h2>Whose methods these are</h2>
+
+<p>Almost nothing here is MolCompose's own idea. Every number below is somebody
+else's published method, and reading it correctly means knowing which one and
+under what assumptions. MolCompose's contribution is that they are computed on
+one interface, under criteria it states, and recorded so the result can be
+replayed.</p>
+
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>What the panel shows</th><th>Whose method, and what it assumes</th></tr>
+
+<tr><td>Interface residues, contacts</td>
+<td>Geometry, computed here. A residue is at the interface when it meets the
+criterion and cutoff shown in <b>Detect interface</b> — heavy atoms at
+4.5&nbsp;&Aring; by default. There is no standard definition, so the one used
+is always printed beside the count.</td></tr>
+
+<tr><td>Buried surface area (&Delta;SASA)</td>
+<td>Solvent-accessible surface from ChimeraX's own <code>measure sasa</code>
+(Pettersen <i>et al.</i> 2021), taken as ½[(SASA<sub>A</sub> +
+SASA<sub>B</sub>) &minus; SASA<sub>AB</sub>]. The reference PRODIGY
+implementation uses freesasa with ProtOr radii, so absolute values differ
+slightly from that server's.</td></tr>
+
+<tr><td>Predicted &Delta;G and K<sub>d</sub></td>
+<td><em>PRODIGY</em>'s IC-NIS model (Vangone &amp; Bonvin 2015; Xue <i>et al.</i>
+2016): a linear fit over contact counts binned by residue polarity, at a fixed
+5.5&nbsp;&Aring; contact shell independent of the cutoff used for display. It
+is an empirical estimate on a single conformation — the softest number the
+panel reports — and it was fitted on rigid-body complexes.</td></tr>
+
+<tr><td>Typed interactions</td>
+<td>Salt bridge, hydrophobic, &pi;-stacking, cation&ndash;&pi; and disulfide,
+detected with distance and geometry criteria following <em>PLIP</em> (Adasme
+<i>et al.</i> 2021). Each type's threshold is a command keyword, so a figure
+can state what it drew.</td></tr>
+
+<tr><td>DockQ, and its CAPRI class</td>
+<td><em>DockQ</em> (Mirabello &amp; Wallner 2024). Requires a reference
+structure, and is only meaningful when the chain mapping between model and
+reference is right — which is why the panel makes you choose it.</td></tr>
+
+<tr><td>pLDDT, PAE</td>
+<td>AlphaFold's own per-residue confidence and predicted aligned error (Jumper
+<i>et al.</i> 2021), read from the prediction's files. pLDDT is read from the
+B-factor column, which is a convention, not a guarantee: on an experimental
+structure that column is displacement, and the panel treats them as different
+metrics for that reason.</td></tr>
+
+<tr><td>pDockQ</td>
+<td>Bryant, Pozzati &amp; Elofsson 2022. Defined on a C&beta; interface at
+8&nbsp;&Aring;, which MolCompose measures for it regardless of the cutoff on
+screen.</td></tr>
+
+<tr><td>pDockQ2, ipSAE, LIS</td>
+<td>Later interface-confidence scores over the PAE matrix — ipSAE is Dunbrack
+2025. All three answer "is this interface predicted confidently", not "is it
+correct". See the manuscript's reference list for the full citations.</td></tr>
+
+<tr><td>Predicted &Delta;&Delta;G</td>
+<td>Whatever predictor produced the file you load; MolCompose runs none of
+them. <em>Pythia</em> and <em>PythiaStudio</em> output is read directly, anything
+else through a generic table. Positive means a substitution is destabilising.
+</td></tr>
+
+<tr><td>MM/PBSA per-residue contribution</td>
+<td><em>gmx_MMPBSA</em>'s decomposition, computed by you over an MD trajectory
+and read here. Negative means a residue contributes favourably — the opposite
+sign to &Delta;&Delta;G. Absolute MM/PBSA binding energies are not reliable:
+they carry no entropy term and move with the internal dielectric and the salt
+model, so the defensible use is relative, within one system or between systems
+computed identically.</td></tr>
+
+<tr><td>Colour scales</td>
+<td>ColorBrewer's diverging and sequential ramps. The AlphaFold confidence
+bands use AlphaFold's own four colours, so a MolCompose figure and an AlphaFold
+viewer agree about what a colour means.</td></tr>
+
+<tr><td>Sequence colouring</td>
+<td>Written as SCF, the format ChimeraX's own Sequence Viewer reads.</td></tr>
+</table>
+
+<p>Full citations are in the accompanying paper. If you publish a figure or a
+number from this panel, cite the method that produced it as well as
+MolCompose — the report written by <b>Write Report&hellip;</b> lists the ones
+it used.</p>
+
+<h2>Notes</h2>
+<ul>
+<li>Background, lighting, and silhouettes are scene-global ChimeraX settings;
+representations and colors apply only to the selected model.</li>
+<li><b>Reset Appearance</b> restores the MolCompose neutral baseline, not
+arbitrary pre-MolCompose state. Preserve complex prior state with a native
+ChimeraX session.</li>
+<li>You keep full native ChimeraX command and mouse control at all times; the
+panel is a thin client over the commands.</li>
+</ul>
+</body>
+</html>

@@ -1,0 +1,38 @@
+# Second worked example, run inside real ChimeraX.
+#
+#   ChimeraX --nogui --silent --exit --script tests/integration/characterise_1acb.cxc
+#
+# 1ACB: alpha-chymotrypsin (E) with eglin c (I). A protease-inhibitor complex,
+# so a different interface chemistry from barnase-barstar — larger, with the
+# inhibitor loop inserted into the active site rather than a charged patch
+# meeting a charged patch.
+#
+# It exists because until now every worked number in the manuscript came from
+# one complex. 1ACB and 3SGB are already used for the PRODIGY cross-validation
+# in section 3.1, so a second end-to-end example costs no new data.
+#
+# Expected, from the prodigy-prot cross-validation (Data S1):
+#   contact terms at 5.5 A ... 72 pairs, CC 3 / CP 2 / AC 19 / PP 4 / AP 19 / AA 25
+#   dG ...................... -12.18 kcal/mol (reference -11.9)
+#
+# One caveat specific to this entry, worth knowing before comparing to a
+# prediction: the crystal is nicked, mature chymotrypsin. Chain E has breaks at
+# 13->16 and 146->149 where the activation dipeptides were excised, so 241
+# residues are observed against a 245-residue SEQRES. Predictors build the
+# continuous chain from SEQRES. The interface is unaffected, but the two are
+# not the same molecule.
+
+close all
+open 1acb
+
+molcompose capabilities model #1
+molcompose interface E I model #1 distance 4.5
+molcompose interactions model #1
+molcompose buriedarea model #1
+molcompose affinity model #1
+molcompose hotspots model #1 top 12
+
+# The one-call path must agree with the individual commands above.
+molcompose characterise E I model #1
+
+molcompose report /private/tmp/molcompose-1acb-report.md model #1 format md

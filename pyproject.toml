@@ -1,0 +1,177 @@
+[build-system]
+requires = ["setuptools", "ChimeraX-BundleBuilder"]
+build-backend = "chimerax.bundle_builder.cx_pep517"
+
+[project]
+name = "ChimeraX-MolCompose"
+version = "0.1.2"
+description = "Interface analysis and publication-ready figures for solved and predicted complexes, from a panel, the command line, or an LLM agent"
+readme = "README.md"
+license = "BSD-3-Clause"
+authors = [{ name = "Jiajun Li" }]
+dependencies = [
+  "ChimeraX-Core ~=1.0",
+  "ChimeraX-UI ~=1.0",
+  "ChimeraX-Atomic ~=1.0",
+]
+dynamic = ["classifiers", "requires-python"]
+
+# Not runtime dependencies: ChimeraX ships numpy, and the bundle installs
+# neither of these. They are what the host-light suite needs to run *outside*
+# ChimeraX, which is how the tests run in CI and on a contributor's machine;
+# five core modules import numpy, and prodigy_prot is what the PRODIGY tests
+# check against. Declared here so `pip install -e ".[test]"` is the whole
+# setup, rather than a list someone has to reconstruct from an import error.
+[project.optional-dependencies]
+test = [
+  "pytest>=8,<10",
+  "ruff>=0.12,<1",
+  "numpy",
+  "prodigy-prot",
+]
+
+[tool.chimerax]
+pure = true
+min-session-version = 1
+max-session-version = 1
+module-name-override = "molcompose"
+# Structure Analysis first: that is the shelf this tool belongs on and the
+# one comparable bundles sit on, and eighteen of the twenty-three commands
+# below already declare it. Depiction stays because the figure work is real.
+categories = ["Structure Analysis", "Depiction"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Visualization",
+]
+
+[tool.chimerax.tool."MolCompose"]
+# This is what places the panel in the Tools menu, and it is not the same knob
+# as the bundle categories above. Under Depiction the panel sat away from every
+# tool it competes with; PICKLUSTER is under Tools > Structure Analysis, which
+# is where someone looking for interface analysis looks first.
+category = "Structure Analysis"
+description = "Compose publication-ready protein structure figures"
+
+[tool.chimerax.command."molcompose"]
+category = "Structure Analysis"
+description = "List the MolCompose commands"
+
+[tool.chimerax.command."molcompose style"]
+category = "Depiction"
+description = "Apply a versioned MolCompose visual preset"
+
+[tool.chimerax.command."molcompose interface"]
+category = "Structure Analysis"
+description = "Detect an interface between two protein chain groups"
+
+[tool.chimerax.command."molcompose interface all"]
+category = "Structure Analysis"
+description = "Detect every contacting protein chain pair"
+
+[tool.chimerax.command."molcompose focus"]
+category = "Depiction"
+description = "Frame the view: model, interface, face-on, or open-book"
+
+[tool.chimerax.command."molcompose export"]
+category = "Depiction"
+description = "Export a publication PNG and optional ChimeraX session"
+
+[tool.chimerax.command."molcompose flexibility"]
+category = "Structure Analysis"
+description = "Load per-residue RMS fluctuation from a trajectory"
+
+[tool.chimerax.command."molcompose energy"]
+category = "Structure Analysis"
+description = "Load a per-residue MM/PBSA decomposition"
+
+[tool.chimerax.command."molcompose ddg"]
+category = "Structure Analysis"
+description = "Load predicted mutation effects from a predictor"
+
+[tool.chimerax.command."molcompose hotspots"]
+category = "Structure Analysis"
+description = "Rank interface residues by buried surface area"
+
+[tool.chimerax.command."molcompose blocks"]
+category = "Structure Analysis"
+description = "List the four named parts of a characterised complex"
+
+[tool.chimerax.command."molcompose dockq"]
+category = "Structure Analysis"
+description = "DockQ and CAPRI components against a reference complex"
+
+[tool.chimerax.command."molcompose characterise"]
+category = "Structure Analysis"
+description = "Run the full interface characterisation in one call"
+
+[tool.chimerax.command."molcompose report"]
+category = "Structure Analysis"
+description = "Write a complete interface characterization report"
+
+[tool.chimerax.command."molcompose buriedarea"]
+category = "Structure Analysis"
+description = "Buried surface area of the detected interface"
+
+[tool.chimerax.command."molcompose affinity"]
+category = "Structure Analysis"
+description = "Predict binding free energy and Kd (PRODIGY IC-NIS)"
+
+[tool.chimerax.command."molcompose interactions"]
+category = "Structure Analysis"
+description = "Detect typed non-covalent interactions across the interface"
+
+[tool.chimerax.command."molcompose ipsae"]
+category = "Structure Analysis"
+description = "ipSAE interface scores from a prediction PAE file"
+
+[tool.chimerax.command."molcompose capabilities"]
+category = "Structure Analysis"
+description = "Report which analyses this structure supports"
+
+[tool.chimerax.command."molcompose confidence"]
+category = "Structure Analysis"
+description = "Report pLDDT, ipLDDT, and pDockQ for a predicted model"
+
+[tool.chimerax.command."molcompose contacts"]
+category = "Structure Analysis"
+description = "Show close contacts across the detected interface"
+
+[tool.chimerax.command."molcompose hbonds"]
+category = "Structure Analysis"
+description = "Show hydrogen bonds across the detected interface"
+
+[tool.chimerax.command."molcompose reset"]
+category = "Depiction"
+description = "Reset a model to the MolCompose neutral baseline"
+
+[tool.chimerax.command."molcompose seqcolor"]
+category = "Structure Analysis"
+description = "Export the per-residue colouring as SCF for the Sequence Viewer"
+
+[tool.chimerax.command."molcompose source"]
+category = "Structure Analysis"
+description = "Declare who issues the next command, for source attribution"
+
+[tool.chimerax.package-data]
+"src/docs" = ["**/*.html", "**/*.png"]
+# The tab icons. Non-code files are shipped only if declared: building without
+# this line produces a wheel with 24 fewer files and every .py still in place,
+# measured both ways on 2026-08-17.
+"src/icons" = ["*.png"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.chimerax.command."molcompose color by"]
+category = "Depiction"
+description = "Colour interface residues by a per-residue metric"
