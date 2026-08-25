@@ -1,0 +1,42 @@
+# End-to-end characterisation check, run inside real ChimeraX.
+#
+#   ChimeraX --nogui --silent --exit --script tests/integration/characterise_1brs.cxc
+#
+# The host-light suite cannot reach anything that needs the ChimeraX SASA
+# engine, so buried area, %NIS, dG, Kd and the per-residue hot-spot ranking are
+# unverified there. Those are exactly the numbers the manuscript still quotes
+# from a one-off session, so this file exists to regenerate them on demand and
+# to prove the whole stack still runs against a real structure.
+#
+# Expected, from tests/unit/core/test_golden_1brs.py (already locked):
+#   interface 4.5 A ....... 19 + 16 residues, 43 contacts
+#   affinity contacts ..... 68 at 5.5 A, binned CC 11 / AC 25 / PP 2 / AP 11
+#   salt bridges .......... 4, including the Asp39 triad
+# Expected, from the cross-validation session (this run confirms them):
+#   buried area ........... 1129 A^2
+#   dG .................... -10.63 kcal/mol
+#
+# Export is deliberately absent: it is covered by molcompose_smoke.cxc, and
+# offscreen rendering is not guaranteed in a headless session.
+
+close all
+open 1brs
+
+molcompose capabilities model #1
+molcompose interface A D model #1 distance 4.5
+molcompose interactions model #1
+molcompose buriedarea model #1
+molcompose affinity model #1
+molcompose hotspots model #1
+
+# The one-call path must agree with the individual commands above, and must
+# list confidence as skipped: 1BRS is X-ray and its B-factor column is not
+# pLDDT, so a number there would be a scientific error, not a bug.
+molcompose characterise A D model #1
+
+molcompose report /private/tmp/molcompose-1brs-report.md model #1 format md
+
+# NOTE: `molcompose confidence model #1` is deliberately NOT run here. It raises
+# a UserError on this structure -- which is the correct behaviour -- and a
+# UserError aborts the rest of a .cxc script. The refusal is covered by the unit
+# tests and is visible in the `skipped` field of the characterise summary above.

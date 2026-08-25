@@ -1,0 +1,149 @@
+{
+  "model": "#1",
+  "name": "1brs.pdb",
+  "steps": [
+    "interface",
+    "interactions",
+    "buried_area",
+    "affinity",
+    "hotspots",
+    "figure"
+  ],
+  "skipped": {
+    "confidence": "#1 is an experimentally determined structure (X-RAY DIFFRACTION); its B-factors are temperature factors, not pLDDT confidence values. Confidence metrics apply only to predicted models.",
+    "interface_scores": "no PAE file found next to 1brs.pdb. Pass one explicitly, or check that the predictor's confidence file was kept alongside the structure — without it ipSAE, pDockQ2 and LIS cannot be computed."
+  },
+  "interface": {
+    "chains_a": [
+      "A"
+    ],
+    "chains_b": [
+      "D"
+    ],
+    "criterion": "heavy",
+    "cutoff": 4.5,
+    "residues_a": 19,
+    "residues_b": 16,
+    "contact_pairs": 43
+  },
+  "interactions": {
+    "salt-bridge": 4,
+    "hydrophobic": 2,
+    "pi-stacking": 1,
+    "cation-pi": 2,
+    "disulfide": 0
+  },
+  "interaction_detail": [
+    {
+      "kind": "cation-pi",
+      "a": "LYS A:27",
+      "b": "TRP D:38",
+      "distance": 4.66,
+      "detail": "LYS27→TRP38"
+    },
+    {
+      "kind": "cation-pi",
+      "a": "ARG A:59",
+      "b": "TRP D:38",
+      "distance": 4.18,
+      "detail": "ARG59→TRP38"
+    },
+    {
+      "kind": "hydrophobic",
+      "a": "PHE A:82",
+      "b": "TRP D:44",
+      "distance": 3.61,
+      "detail": "CB–CZ3"
+    },
+    {
+      "kind": "hydrophobic",
+      "a": "TYR A:103",
+      "b": "ALA D:36",
+      "distance": 4.27,
+      "detail": "CD1–CB"
+    },
+    {
+      "kind": "pi-stacking",
+      "a": "HIS A:102",
+      "b": "TYR D:29",
+      "distance": 4.79,
+      "detail": "T-shaped (79°)"
+    },
+    {
+      "kind": "salt-bridge",
+      "a": "ARG A:59",
+      "b": "GLU D:76",
+      "distance": 2.97,
+      "detail": "NH1–OE1"
+    },
+    {
+      "kind": "salt-bridge",
+      "a": "ARG A:83",
+      "b": "ASP D:39",
+      "distance": 2.5,
+      "detail": "NH2–OD1"
+    },
+    {
+      "kind": "salt-bridge",
+      "a": "ARG A:87",
+      "b": "ASP D:39",
+      "distance": 2.93,
+      "detail": "NH2–OD2"
+    },
+    {
+      "kind": "salt-bridge",
+      "a": "HIS A:102",
+      "b": "ASP D:39",
+      "distance": 2.81,
+      "detail": "NE2–OD2"
+    }
+  ],
+  "buried_area": 1129.438817816379,
+  "affinity": {
+    "delta_g": -10.629606296296297,
+    "kd": 1.5967576352774265e-08,
+    "temperature": 25.0
+  },
+  "hotspots": [
+    {
+      "residue": "ARG A:59",
+      "buried_area": 120.7
+    },
+    {
+      "residue": "HIS A:102",
+      "buried_area": 109.0
+    },
+    {
+      "residue": "TYR D:29",
+      "buried_area": 107.9
+    },
+    {
+      "residue": "ASP D:35",
+      "buried_area": 72.6
+    },
+    {
+      "residue": "ASP D:39",
+      "buried_area": 70.5
+    },
+    {
+      "residue": "GLN A:104",
+      "buried_area": 62.0
+    },
+    {
+      "residue": "ARG A:83",
+      "buried_area": 60.4
+    },
+    {
+      "residue": "TRP D:44",
+      "buried_area": 56.4
+    },
+    {
+      "residue": "TRP D:38",
+      "buried_area": 51.1
+    },
+    {
+      "residue": "LEU D:34",
+      "buried_area": 49.7
+    }
+  ]
+}

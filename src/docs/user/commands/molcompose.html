@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>MolCompose</title>
+</head>
+<body>
+<h1>MolCompose commands</h1>
+
+<p>MolCompose composes reproducible, publication-oriented protein structure
+figures. Every panel action in the
+<a href="../tools/molcompose.html">MolCompose tool</a> runs one of the commands
+below, so the ChimeraX Log always contains a complete, replayable recipe.</p>
+
+<h2>Command summary</h2>
+<pre>
+molcompose style &lt;preset&gt; [model &lt;model-spec&gt;] [labels &lt;n&gt;]
+                 [references &lt;model-spec,...&gt;] [align &lt;chain&gt;] [partner &lt;chain&gt;]
+molcompose interface &lt;group-a&gt; &lt;group-b&gt; [model &lt;model-spec&gt;]
+                     [distance 4.5] [criterion heavy]
+molcompose interface all [model &lt;model-spec&gt;] [distance 4.5]
+molcompose focus [model|interface] [model &lt;model-spec&gt;]
+molcompose hbonds [model &lt;model-spec&gt;] [off false]
+molcompose contacts [model &lt;model-spec&gt;] [off false]
+molcompose characterise &lt;group-a&gt; &lt;group-b&gt; [model &lt;model-spec&gt;]
+                       [distance 4.5] [criterion heavy] [style true]
+molcompose report &lt;path&gt; [model &lt;model-spec&gt;] [format json|csv|md]
+molcompose buriedarea [model &lt;model-spec&gt;]
+molcompose hotspots [model &lt;model-spec&gt;] [minArea 10] [top 0]
+molcompose ddg &lt;path&gt; [model &lt;model-spec&gt;] [format tabular|pythia]
+               [statistic min|max|mean] [top 15]
+molcompose affinity [model &lt;model-spec&gt;] [temperature 25]
+molcompose interactions [model &lt;model-spec&gt;] [types &lt;list&gt;] [off false]
+                       [saltBridge 4.0] [hydrophobic 4.5]
+                       [piStacking 5.5] [cationPi 6.0]
+molcompose dockq &lt;reference&gt; [model &lt;model-spec&gt;] [chainMap A:C,B:D]
+molcompose capabilities [model &lt;model-spec&gt;] [predictor &lt;name&gt;] [paeFile &lt;path&gt;]
+molcompose confidence [model &lt;model-spec&gt;]
+molcompose ipsae &lt;pae-file&gt; [model &lt;model-spec&gt;] [paeCutoff 10]
+molcompose export &lt;path.png|.tif&gt; [width 2400] [height 1800] [supersample 3]
+                  [transparent false] [saveSession false] [overwrite false]
+                  [dpi 300] [saveRecipe false] [keyFontSize &lt;pixels&gt;]
+molcompose flexibility &lt;rmsf.xvg&gt; chains &lt;list&gt; [model &lt;model-spec&gt;]
+molcompose energy &lt;decomp.dat&gt; chains &lt;file:model,...&gt;
+                  [model &lt;model-spec&gt;] [top 10] [solvation gb|pb]
+molcompose color by plddt|ddg|dsasa|bfactor|mmpbsa|rmsf [model &lt;model-spec&gt;]
+                    [statistic min|max|mean] [scope interface|all]
+molcompose blocks [model &lt;model-spec&gt;]
+molcompose source &lt;name&gt;
+molcompose seqcolor [&lt;path.scf&gt;] [model &lt;model-spec&gt;]
+                    [source interface|plddt|ddg|dsasa|bfactor|mmpbsa]
+                    [statistic min|max|mean] [load true|false]
+molcompose reset [model &lt;model-spec&gt;]
+</pre>
+
+<h2>molcompose style</h2>
+<p><code>labels &lt;n&gt;</code> overrides how many residues per side the preset
+labels, ranked by buried area; <code>labels 0</code> turns them off. Without it
+each preset keeps its own count, and those counts differ by design —
+<code>paratope-closeup</code> labels two because two is what fits a tight
+close-up with its labels fanned apart, <code>licorice-chain</code> labels three,
+and the metric carriers label none. That is the right default for each preset
+alone and the wrong one for a multi-panel plate, where two panels then disagree
+about how many residues are named without anyone having chosen it.</p>
+<p>Applies a versioned visual preset to the selected model. Presets are
+idempotent: applying the same preset twice produces the same state. The MVP
+presets are:</p>
+<ul>
+<li><b>clean-cartoon</b> — smooth single-color cartoon for monomers.</li>
+<li><b>complex-by-chain</b> — one stable, color-vision-conscious color per
+protein chain. Chain colors depend only on chain IDs, never on load order.</li>
+<li><b>interface-focus</b> — requires a completed
+<code>molcompose interface</code> analysis; shows interface residues as
+saturated sticks (Group A blue, Group B orange) over a subdued cartoon with a
+local semi-transparent surface, and fits the view to the interface.</li>
+<li><b>design-reference</b> — command-only comparison style. It aligns the
+named reference models on the target chain, displays their partner chains
+against the design, and maps the detected design epitope onto the target
+surface. Example: <code>molcompose style design-reference model #1 references
+#2,#3 align A partner B</code>.</li>
+</ul>
+<p>Background, lighting, and silhouette settings are scene-global ChimeraX
+state; atomic representations and colors are scoped to the selected model.</p>
+
+<h2>molcompose interface</h2>
+<p>Detects interface residues between two protein chain groups. Chain groups
+are comma-separated chain IDs, for example <code>A,B</code>. The groups must
+not overlap. A residue pair is an interface contact when any heavy atom of one
+residue lies within the cutoff distance of any heavy atom of the other
+(inclusive). Hydrogens, waters, ions, and ligands are excluded. The cutoff
+defaults to 4.5 &Aring; and accepts 2.0&ndash;10.0 &Aring;.</p>
+<p>The <code>criterion</code> option selects which atoms define a contact:
+<code>heavy</code> (default) uses every non-hydrogen atom;
+<code>cbeta</code> uses one point per residue &mdash; the C&beta; atom, with
+C&alpha; as the conventional glycine fallback. A typical C&beta; cutoff is
+8.0 &Aring;.</p>
+<p>Results (residue counts and contact-pair count) are reported in the Log and
+stored for the model, ready for <code>interface-focus</code> and
+<code>molcompose focus</code>.</p>
+
+<h2>molcompose interface all</h2>
+<p>Scans every protein chain pair of the model with the same rule and reports
+only pairs with at least one contact.</p>
+<p>It is a survey and deliberately makes none of the pairs the <em>active</em>
+interface, because choosing one would silently replace an interface already set
+on purpose. Everything that measures or styles an interface —
+<code>buriedarea</code>, <code>affinity</code>, <code>hotspots</code>,
+<code>contacts</code>, <code>hbonds</code>, the interface presets — still needs
+<code>molcompose interface &lt;A&gt; &lt;B&gt;</code> naming the pair you want.
+The pairs found are remembered, so if you forget, the refusal lists them and
+suggests the one with the most contacts.</p>
+
+<h2>molcompose hbonds</h2>
+<p>Displays hydrogen bonds across the most recently detected interface using
+the native ChimeraX <code>hbonds</code> engine, restricted to contacts between
+Group A and Group B residues. <code>off true</code> removes them again. Run
+<code>molcompose interface</code> first.</p>
+
+<h2>molcompose contacts</h2>
+<p>Displays close-contact pseudobonds across the detected interface using the
+native ChimeraX <code>contacts</code> engine (VDW-overlap based), restricted to
+Group A &harr; Group B. <code>off true</code> removes them.</p>
+
+<h2>molcompose characterise</h2>
+<p>Runs the whole standard characterisation of one interface in a single call
+and returns one structured summary: interface residues and contacts, typed
+non-covalent interactions, buried surface area, predicted &Delta;G and
+K<sub>d</sub>, the residues burying the most surface, prediction-confidence
+metrics where they apply, and the publication figure.</p>
+<p>Steps that do not apply to the structure (confidence metrics on a crystal
+structure, for example) are reported as skipped with the reason rather than
+failing the call. Pass <code>style false</code> to compute without changing
+the display.</p>
+<p>This exists because an agent choosing tools one at a time tends to stop
+early and miss most of the available analysis; the same is true of a hurried
+user.</p>
+
+<h2>molcompose report</h2>
+<p>Writes one file containing the complete characterization of the detected
+interface: geometry (chains, criterion, cutoff, residue counts, contact
+pairs, interface residue list), typed interactions, buried surface area,
+predicted &Delta;G/K<sub>d</sub>, prediction-confidence metrics, an
+auto-written Methods paragraph, and the full command recipe that produced the
+numbers. Analyses that have not been run yet are computed automatically;
+those that do not apply (for example confidence metrics on an experimental
+structure) are omitted rather than failing the report.</p>
+<p>The format follows the file suffix (<code>.md</code>, <code>.json</code>,
+<code>.csv</code>) unless <code>format</code> is given.</p>
+
+<h2>molcompose buriedarea</h2>
+<p>Buried solvent-accessible surface area (&Aring;<sup>2</sup>) of the detected
+interface, via the native ChimeraX <code>measure buriedarea</code>.</p>
+
+<h2>molcompose hotspots</h2>
+<p>Ranks the interface residues by the surface area each one buries
+(per-residue &Delta;SASA = SASA of the residue in its isolated chain group
+minus its SASA in the complex). Residues burying less than
+<code>minArea</code> &Aring;<sup>2</sup> are omitted; <code>top</code> limits
+the list. This is the dependency-free hot-spot ranking; predicted
+&Delta;&Delta;G from external tools can be layered on top.</p>
+
+<h2>molcompose ddg</h2>
+<p>Loads predicted mutation effects (&Delta;&Delta;G) produced by an external
+predictor and ranks residues by them. MolCompose does not run the predictors:
+they carry dependencies (PyTorch/CUDA for Pythia and Pythia-PPI), proprietary
+licences (FoldX) or large installations (Rosetta). This command consumes their
+output, exactly as the predicted-structure workflow consumes AlphaFold files.</p>
+<p>Two input formats are recognised:</p>
+<ul>
+<li><b>tabular</b> (<code>.csv</code>/<code>.tsv</code>): a header naming
+chain, position, wild-type, mutant and &Delta;&Delta;G columns under any of
+several common spellings. FoldX, Rosetta and PythiaStudio exports can be
+reshaped into this form.</li>
+<li><b>pythia</b> (<code>*_pred_mask.txt</code>): Pythia's own output.
+<b>Note:</b> Pythia positions are sequential indices over the scored structure,
+not PDB residue numbers, so the open model must correspond to the file that was
+scored.</li>
+</ul>
+<p><code>statistic</code> selects the per-residue summary: <code>min</code>
+(most stabilising substitution, the default), <code>max</code> (most
+destabilising) or <code>mean</code>. Because different predictors are known to
+disagree substantially, each record keeps its source so several can be compared
+side by side.</p>
+
+<h2>molcompose affinity</h2>
+<p>Predicts the binding free energy (&Delta;G, kcal/mol) and dissociation
+constant (K<sub>d</sub>, M) of the detected interface using the PRODIGY IC-NIS
+contacts model (Vangone &amp; Bonvin, <i>eLife</i> 2015; Xue et al.,
+<i>Bioinformatics</i> 2016). Requires <code>molcompose interface</code> first;
+the chain groups are taken from the detected interface.</p>
+<p>The model is defined at a fixed 5.5 &Aring; heavy-atom contact cutoff, so
+contacts are recomputed at that distance regardless of the cutoff used for the
+stored interface. The Log reports the four contact-class counts and the
+non-interacting-surface composition alongside the prediction.</p>
+<p><b>Accuracy:</b> the contact terms reproduce the reference implementation
+exactly. The %NIS terms depend on the solvent-accessibility engine &mdash;
+MolCompose uses native ChimeraX <code>measure sasa</code>, the reference uses
+freesasa &mdash; which shifts &Delta;G by 0.1&ndash;0.6 kcal/mol on benchmark
+complexes, well within the model's own reported RMSE of 1.89 kcal/mol.
+Predictions are validated for protein&ndash;protein complexes of standard
+amino acids.</p>
+
+<h2>molcompose interactions</h2>
+<p>Detects and displays typed non-covalent interactions across the most
+recently detected interface, following the conventions used by PLIP and
+Arpeggio. Requires <code>molcompose interface</code> first.</p>
+<table border="1" cellpadding="4" cellspacing="0">
+<tr><th>Type</th><th>Rule</th><th>Default cutoff</th></tr>
+<tr><td>salt-bridge</td><td>Arg/Lys/His N &harr; Asp/Glu O</td><td>4.0 &Aring;</td></tr>
+<tr><td>hydrophobic</td><td>apolar side-chain carbons</td><td>4.5 &Aring;</td></tr>
+<tr><td>pi-stacking</td><td>aromatic ring centroids, classified parallel
+(&le;30&deg;) or T-shaped (&ge;60&deg;)</td><td>5.5 &Aring;</td></tr>
+<tr><td>cation-pi</td><td>Arg/Lys charge centre &harr; ring centroid</td><td>6.0 &Aring;</td></tr>
+<tr><td>disulfide</td><td>Cys SG&ndash;SG</td><td>2.5 &Aring;</td></tr>
+</table>
+<p>Use <code>types</code> with a comma-separated subset (for example
+<code>types salt-bridge,cation-pi</code>) to restrict detection. Each type is
+drawn as its own named, differently coloured pseudobond group;
+<code>off true</code> removes them. Every threshold is a command option, so
+the exact rule set is recorded in the Log with the result.</p>
+
+<h2>molcompose capabilities</h2>
+<p>Reports whether a structure is experimentally determined or predicted, and
+exactly which analyses it supports &mdash; with a reason for every metric that
+does not apply. Run this when a structure's provenance is unclear: it prevents
+asking for confidence metrics on a crystal structure, or for PAE-derived
+scores without a PAE matrix.</p>
+<ul>
+<li><b>Experimental</b> &mdash; geometry, buried area, &Delta;G/K<sub>d</sub>,
+typed interactions and hot spots. No confidence metric applies.</li>
+<li><b>Predicted (coordinates only)</b> &mdash; the above plus pLDDT, ipLDDT
+and pDockQ.</li>
+<li><b>Predicted with a PAE matrix</b> &mdash; additionally ipSAE, pDockQ2 and
+LIS.</li>
+</ul>
+<p><code>predictor</code> (alphafold-server, alphafold-db, colabfold, boltz or
+generic) guides the search for a companion PAE file next to the structure;
+<code>paeFile</code> names one explicitly. DockQ is never listed as available
+because it needs a separate reference structure.</p>
+
+<h2>molcompose confidence</h2>
+<p>Reports prediction-confidence metrics computable from the structure file:
+the detected pLDDT scale, mean pLDDT, and &mdash; when an interface has been
+detected &mdash; ipLDDT (mean pLDDT over interface residues) and pDockQ
+(Bryant et al., Nat Commun 2022). The canonical pDockQ protocol uses
+<code>criterion cbeta</code> with an 8.0 &Aring; cutoff. ipTM, pTM, and iPAE
+require the prediction's confidence JSON and are planned.</p>
+
+<h2>molcompose dockq</h2>
+<p>Scores a predicted complex against an open reference structure with DockQ
+(Basu &amp; Wallner, <i>PLoS ONE</i> 2016; DockQ v2, <i>Bioinformatics</i>
+2024) and its CAPRI components:</p>
+<ul>
+<li><b>Fnat</b> &mdash; fraction of reference interface residue contacts
+(5 &Aring; heavy-atom) reproduced by the model, plus Fnonnat for novel ones.</li>
+<li><b>iRMSD</b> &mdash; backbone RMSD over reference interface residues
+(10 &Aring; definition) after optimal superposition.</li>
+<li><b>LRMSD</b> &mdash; backbone RMSD of the smaller chain group after
+superposing the larger one.</li>
+</ul>
+<p>DockQ combines the three as
+(Fnat + 1/(1+(iRMSD/1.5)<sup>2</sup>) + 1/(1+(LRMSD/8.5)<sup>2</sup>))/3 and is
+reported with its CAPRI band (High &ge; 0.80, Medium &ge; 0.49,
+Acceptable &ge; 0.23).</p>
+<p>Chain groups come from the model's detected interface; use
+<code>chainMap</code> (for example <code>A:C,B:D</code>) when the reference
+uses different chain IDs. Residues are matched by chain, number and insertion
+code.</p>
+<p><b>Note:</b> unlike pLDDT, pDockQ and ipSAE, which score a prediction on its
+own, DockQ requires a trusted reference structure.</p>
+
+<h2>molcompose ipsae</h2>
+<p>Computes ipSAE interface scores (Dunbrack, bioRxiv 2025; d0res variant) for
+every chain pair from a prediction's PAE file &mdash; AF2/AF3/ColabFold JSON or
+Boltz NPZ. The PAE token count must equal the model's amino-acid residue
+count; models with ligands, nucleic acids, or modified residues are rejected
+with an explanation. Reports both asymmetric values and the pair maximum.</p>
+
+<h2>molcompose focus</h2>
+<p>Fits the view to the whole model (<code>focus model</code>) or to the most
+recently detected interface (<code>focus interface</code>, the default).</p>
+
+<h2>molcompose export</h2>
+<p>Exports a publication image using the native ChimeraX <code>save</code>
+command with explicit width, height, supersampling, and background
+transparency. Width and height accept 1&ndash;16384 pixels; supersample
+accepts 1&ndash;8. The output path must end in <code>.png</code>,
+<code>.tif</code> or <code>.tiff</code> &mdash; both lossless, which JPEG is
+not on a hard silhouette against a white ground. Existing files are never
+overwritten unless <code>overwrite true</code> is given.</p>
+<p><code>dpi</code> is written into the saved file's own metadata, so a
+publisher reads the figure's physical size rather than asking for it again;
+it accepts 72&ndash;2400, or 0 to leave the file unstamped. It does not change
+the pixels &mdash; 2008 px at 600 dpi is 85 mm wide, a single column.</p>
+<p><code>keyFontSize</code> sets the colour key's font, in pixels of this
+image, for this export only; the scene's own size is put back afterwards. The
+key's font is in pixels, so what it comes out as in print depends on how wide
+the image is placed: the default suits one panel across two columns and is too
+small for the same panel as one cell of four. Both <code>key</code> commands go
+into the recipe, so a replay reproduces the figure. Asking for it with no
+colour key in the scene is an error rather than a silent generic scale.</p>
+
+<p>With <code>saveSession true</code>, a ChimeraX session (<code>.cxs</code>)
+is saved alongside the image. With <code>saveRecipe true</code>, the command
+recipe that produced the figure is written beside it as a
+<code>.cxc</code> command file, so the figure can be replayed on another
+machine and after this session closes.</p>
+
+<h2>What a &Delta;&Delta;G file has to look like</h2>
+<p><code>molcompose ddg</code> does not run a predictor and does not know one
+predictor's output from another's. It reads three shapes, and picks between
+them by the file's name and header unless <code>format</code> says
+otherwise:</p>
+<ul>
+<li><b>tabular</b> &mdash; any CSV or TSV with a header row. It needs columns
+for the <b>position</b> (<code>position</code>, <code>pos</code>,
+<code>resnum</code>, <code>residue</code>, <code>resi</code> or
+<code>res_num</code>), the <b>mutant</b> residue (<code>mut</code>,
+<code>mutant</code>, <code>to</code> or <code>alt</code>) and the <b>value</b>
+(<code>ddg</code>, <code>delta_delta_g</code>, <code>score</code>,
+<code>energy</code> or <code>prediction</code>). A <b>chain</b>
+(<code>chain</code>, <code>chain_id</code>, <code>chainid</code>) and a
+<b>wild type</b> (<code>wt</code>, <code>wild_type</code>, <code>from</code>,
+<code>ref</code>) are optional but worth giving: the wild-type letters are what
+verify the file describes this structure, and without a chain the values cannot
+be placed on a complex. Rows that do not parse are skipped rather than failing
+the file.</li>
+<li><b>pythia</b> &mdash; Pythia's own mask output, recognised by
+<code>pred_mask</code> in the filename. Its positions are sequential indices,
+not residue numbers, and are mapped back through the structure.</li>
+<li><b>pythia-ppi</b> &mdash; PythiaStudio's binding-&Delta;&Delta;G export: an
+<code>.xlsx</code> workbook, or a CSV whose header is exactly
+<code>Mutation,Chain,Position,ddG</code>.</li>
+</ul>
+<p><b>Other predictors need a conversion first.</b> FoldX, Rosetta and most web
+servers write their own layouts &mdash; FoldX's <code>.fxout</code> files, for
+instance, carry the mutation in a separate list and the energy under
+<code>total energy</code>, which none of the readers above accept. Reshaping
+such output into the tabular form is a few lines of a script and is deliberately
+left outside this tool: MolCompose reads predictions, it does not pretend to
+know every predictor. The button says <i>Load &Delta;&Delta;G</i> because the
+quantity is what matters to the figure; the format is this section's business.
+</p>
+
+<h2>molcompose flexibility</h2>
+<p>Loads per-residue RMS fluctuation written by <code>gmx rmsf -res</code> — the
+one thing every other metric here is blind to, since all of them describe a
+single conformation and this describes how much that conformation moves.
+Values are converted from nm to &Aring; on the way in.</p>
+<p><code>chains</code> names one chain per block of the file, in the order the
+selection was written, as in <code>chains A,D</code>. It is required because
+<code>gmx rmsf -res</code> <em>restarts its numbering at each chain</em>: a
+two-chain file reads 1&ndash;110 then 1&ndash;89, not 1&ndash;199, and nothing
+in it says which chain is which. Read as one running index, the second chain's
+fluctuations land on the first chain's opening residues. Each block's length is
+checked against its chain, and a file that does not line up is refused rather
+than trimmed.</p>
+<p>Fluctuation is not a contribution. A residue that moves a great deal may be
+a flexible loop nowhere near the interface, and one that barely moves may
+simply be buried in the core, so <code>color by rmsf</code> uses a sequential
+ramp — more is more — rather than the diverging one the energies get.</p>
+
+<h2>molcompose energy</h2>
+<p>Loads the per-residue MM/PBSA decomposition <code>gmx_MMPBSA</code> writes
+(<code>FINAL_DECOMP_MMPBSA.dat</code>) and attaches it to a structure, giving a
+third answer to which residue matters: buried area is geometry, predicted
+&Delta;&Delta;G is what removing a residue costs, and this is what keeping it
+earns. Only the file's <code>DELTAS</code> section is read — the complex,
+receptor and ligand sections are absolute energies of one state, an order of
+magnitude larger and a different quantity.</p>
+<p><code>chains</code> maps the file's chain letters onto the model's, as in
+<code>chains A:A,B:D</code>, and is required rather than inferred. GROMACS
+relabels chains when a system is built, so a decomposition of PDB 1BRS arrives
+with chains A and B where the structure has A and D. The file's residue names
+are then checked against the structure, and a map the structure contradicts is
+refused: attaching one partner's energies to the other is the same class of
+error as scoring DockQ against a differently numbered reference.</p>
+<p><code>solvation</code> is <code>gb</code> or <code>pb</code>, and is
+required only when the run computed both. <code>gmx_MMPBSA</code> then writes
+the whole decomposition twice, once under each heading, and the two disagree
+by several kcal/mol — on the packaged 1BRS run the overall figure is
+&minus;80.75 under Generalized Born and &minus;72.93 under Poisson Boltzmann.
+A file carrying both is not one result to be averaged, so the command names
+the choice rather than making it. The three packaged examples all carry both.</p>
+<p>The values keep the file's sign — negative where a residue contributes
+favourably — which is the opposite of the &Delta;&Delta;G convention. See
+<code>color by mmpbsa</code> for what that means for the colour scale. The
+absolute binding energy is <em>not</em> read: MM/PBSA totals are not comparable
+with the predicted &Delta;G this tool reports, so only the per-residue
+decomposition is loaded.</p>
+
+<h2>molcompose color by</h2>
+<p>Paints residues by a per-residue value instead of by chain:
+<code>plddt</code> and <code>bfactor</code> are read from the structure,
+<code>ddg</code> from a loaded mutation scan, and <code>dsasa</code> is the
+buried area each residue contributes. A colour key is drawn from the same scale
+the residues were painted with, because a key assembled separately is a promise
+to eventually disagree with the figure.</p>
+<p><code>mmpbsa</code> needs <code>molcompose energy</code> first. It is drawn
+on the diverging ramp read the other way round, so that the end meaning
+&ldquo;matters more&rdquo; is the same colour as it is for
+&Delta;&Delta;G — the two are both kcal/mol and mean opposite things by the
+same sign, and one ramp would make red mean &ldquo;important&rdquo; on one
+panel and &ldquo;unfavourable&rdquo; on the next. The numbers are not flipped:
+the key shows the file's own values, signs included.</p>
+<p><code>statistic</code> chooses how a residue's several values become one —
+<code>max</code> by default, which is the disruptive substitution for a
+&Delta;&Delta;G scan. <code>scope</code> defaults to <code>interface</code>,
+which is what these metrics are about; <code>scope all</code> paints the whole
+structure, and is refused for <code>dsasa</code>, which is only defined by what
+two chains bury between them.</p>
+
+<h2>molcompose hotspots</h2>
+<p><code>metric dsasa</code>, the default, ranks interface residues by buried
+surface area. <code>metric energy</code> ranks them by MM/PBSA contribution to
+binding, most favourable first, and needs <code>molcompose energy</code>
+loaded. They are different questions and can disagree — on barnase&ndash;barstar
+Asp35 buries the second-most surface of any residue and does not reach the top
+ten by energy — so the log says which one it answered.</p>
+
+<h2>molcompose blocks</h2>
+<p>Lists the four named parts a characterised complex is divided into — the
+group A and group B chains, and the interface residues on each side. Each is a
+real ChimeraX name, so it can be selected, recoloured, and referred to in any
+native command.</p>
+
+<h2>molcompose source</h2>
+<p>Declares who issues the <em>next</em> recorded command, for the recipe's
+source attribution. It exists because ChimeraX's remote control cannot tell an
+agent from a script from the user's own <code>curl</code>: a caller that knows
+who it is has to say so. One-shot on purpose — it applies to the next recorded
+command and then reverts, so a bridge cannot leave a flag set that attributes
+the user's later typing to an agent.</p>
+
+<h2>molcompose seqcolor</h2>
+<p>Writes the per-residue colouring as an <b>SCF</b> (Sequence Coloring Format)
+file and, unless <code>load false</code> is given, opens the chain's sequence
+and loads it — so the quantity that colours the structure can be read along the
+sequence, where the extent of an interface or a low-confidence stretch is a
+shape rather than a scatter of highlighted residues.</p>
+<p><code>source</code> selects what is drawn: <code>interface</code> (the
+detected interface, in the interface preset's own two colours),
+<code>plddt</code> (the four AlphaFold confidence bands), <code>ddg</code>,
+<code>dsasa</code> or <code>bfactor</code> (the same diverging and sequential
+ramps the structure gets). The colours come from the same functions that paint
+the structure, so the two views cannot disagree.</p>
+<p>One file is written per chain — SCF positions are alignment columns of a
+single sequence — and a multi-chain export appends the chain id to the
+filename. Those positions are <em>not</em> residue numbers: they count from the
+start of the chain's sequence, including any residues the structure does not
+resolve. Omit the path and the file is written beside the structure, or in the
+temporary directory when the structure has no file of its own.</p>
+<p>Regions in the Sequence Viewer are named after what they show
+("interface, group A", "pLDDT 70-90"), so the region browser lists bands rather
+than hundreds of single columns.</p>
+
+<h2>molcompose reset</h2>
+<p>Restores the documented MolCompose neutral baseline (cartoon-only, neutral
+color). It does not attempt to reconstruct arbitrary prior appearance state;
+preserve complex prior state with a native ChimeraX session.</p>
+
+<h2>Model selection</h2>
+<p>When <code>model</code> is omitted and exactly one protein model is open,
+that model is used. With zero or multiple protein models open, the command
+reports the available model IDs and asks for an explicit choice.</p>
+
+<h2>Errors</h2>
+<p>Invalid input (unknown preset, overlapping or unknown chains, cutoff out of
+range, invalid dimensions, existing output file) produces a readable error
+message instead of a Python traceback, and never modifies molecular data.</p>
+</body>
+</html>

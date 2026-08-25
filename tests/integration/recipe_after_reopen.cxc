@@ -1,0 +1,43 @@
+# The command recipe must survive a reused model id, run inside real ChimeraX.
+#
+#   ChimeraX --nogui --silent --exit --script tests/integration/recipe_after_reopen.cxc
+#
+# ChimeraX reuses model ids: close #1 and open something else and the new
+# structure is #1 too. Both of the recipe's defences key on that fact, and both
+# had a hole in them.
+#
+#   - `_record` deduped on the command text alone, so the reopened structure's
+#     characterise line read identically to the closed structure's and was
+#     suppressed as a repeat. `_live_entries` then dropped the surviving line
+#     as dead, and the report came out claiming a complete recipe with nothing
+#     in it — which is self-refuting, and reproducibility is the manuscript's
+#     central claim.
+#   - `_live_entries` tested membership by `id()`, and CPython reuses
+#     addresses, so the opposite failure was available too: a closed
+#     structure's line matching whatever now sits at that address.
+#
+# The unit tests cover both in isolation and passed throughout, including while
+# the live sequence was failing. That is the reason this file exists: the parts
+# were each correct and the sequence was not, so only the sequence can prove it.
+#
+# Expected: the report lists exactly one command, the characterise issued after
+# the reopen, and its provenance sentence is therefore true.
+
+close session
+open 1brs
+
+# First structure, fully analysed, then closed. Its recipe line must not
+# survive into the report below.
+molcompose characterise A D model #1
+close #1
+
+# Second structure. ChimeraX hands it the same id, and its characterise line
+# is byte-identical to the one just discarded.
+open 1brs
+molcompose characterise A D model #1
+
+# One command, from the live structure. Zero means the dedupe swallowed it;
+# two means a closed structure's line came back.
+molcompose report /tmp/molcompose-recipe-after-reopen.json model #1
+
+close session

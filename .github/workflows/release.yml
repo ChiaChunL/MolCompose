@@ -1,0 +1,129 @@
+name: Release
+
+# One tag, two artefacts, two destinations. `molcompose-mcp` is an ordinary
+# Python package and goes to PyPI; the ChimeraX bundle cannot, because its
+# build backend is ChimeraX's own `cx_pep517` and there is no ChimeraX on a
+# runner — so its wheel is built on a machine that has one and uploaded to the
+# release by hand. The Toolshed is where users actually get it.
+#
+# Tag format decides what runs:
+#   v0.1.2       the bundle release; makes the GitHub Release for the hand-built wheel
+#   mcp-v0.1.1   the agent bridge; builds, checks and publishes to PyPI
+#
+# Two prefixes rather than one tag for both, because the two version numbers
+# move independently: the bundle is at 0.1.2 while the bridge is at 0.1.1, and
+# a shared tag would force a version bump on whichever did not change.
+
+on:
+  push:
+    tags:
+      - "v*"
+      - "mcp-v*"
+
+permissions:
+  contents: write        # to create the GitHub Release and attach files
+
+jobs:
+  # ---------------------------------------------------------------- bridge --
+  pypi:
+    name: Publish molcompose-mcp to PyPI
+    if: startsWith(github.ref, 'refs/tags/mcp-v')
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/molcompose-mcp
+    permissions:
+      contents: write
+      id-token: write    # PyPI trusted publishing; no API token in secrets
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: The tag has to agree with the package
+        # A tag is what people cite and what the Release page shows; a package
+        # whose version differs from its tag makes both wrong, and the mistake
+        # is unfixable on PyPI because a version can never be re-uploaded.
+        run: |
+          TAG="${GITHUB_REF_NAME#mcp-v}"
+          PKG=$(python -c "import tomllib;print(tomllib.load(open('mcp/pyproject.toml','rb'))['project']['version'])")
+          echo "tag=$TAG package=$PKG"
+          test "$TAG" = "$PKG"
+
+      - name: Build sdist and wheel
+        run: |
+          python -m pip install --upgrade pip build twine
+          python -m build mcp --outdir dist
+
+      - name: Check the metadata renders
+        # PyPI rejects a bad long_description at upload, after the version is
+        # already spent on a failed attempt.
+        run: twine check dist/*
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          # Re-pushing a tag should not fail the run. A version already on PyPI
+          # cannot be replaced, so the upload has nothing to do — without this
+          # the job dies at that step and leaves a red cross on a release that
+          # was fine. The tag/version check above is what catches a real
+          # mistake; this only makes a repeat idempotent.
+          skip-existing: true
+
+      - name: Attach the same files to a GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          # Named rather than `dist/*`, which also swept up the PEP 740
+          # attestations the publish step had just written there and hung two
+          # `.publish.attestation` files off the release. They are real
+          # provenance, but PyPI hosts and verifies them itself; on a release
+          # page they are only clutter that nobody downloads.
+          files: |
+            dist/*.whl
+            dist/*.tar.gz
+          generate_release_notes: true
+
+  # ---------------------------------------------------------------- bundle --
+  bundle:
+    name: Open the release for the ChimeraX bundle
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: The tag has to agree with the bundle, in both files
+        # `pyproject.toml` decides what the Toolshed serves; `src/__init__.py`
+        # decides the string written into every provenance record and .cxc
+        # header. A figure citing a version that was never released is the one
+        # claim the record exists to prevent, so the tag is checked against
+        # both rather than against whichever is easier to read.
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          PKG=$(python -c "import tomllib;print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+          SRC=$(python -c "import re;print(re.search(r'__version__ = \"([^\"]+)\"',open('src/__init__.py').read()).group(1))")
+          echo "tag=$TAG pyproject=$PKG source=$SRC"
+          test "$TAG" = "$PKG"
+          test "$TAG" = "$SRC"
+
+      - name: Create the release
+        # Without a wheel: it is built where ChimeraX is and uploaded to this
+        # release afterwards, either by hand or with
+        #   gh release upload "$TAG" dist/chimerax_molcompose-*.whl
+        # The release is opened here so the tag, the notes and the checks are
+        # one automated step and only the artefact is manual.
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          body: |
+            Install from the [ChimeraX Toolshed](https://cxtoolshed.rbvi.ucsf.edu/apps/chimeraxmolcompose),
+            or download the wheel below and run, in ChimeraX's command line:
+
+            ```
+            toolshed install /path/to/chimerax_molcompose-${{ github.ref_name }}-py3-none-any.whl
+            ```
+
+            Then quit ChimeraX and start it again — a running ChimeraX keeps
+            the modules it has already loaded.

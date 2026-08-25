@@ -1,0 +1,34 @@
+{
+  "case": "1brs_barnase_barstar",
+  "source_file": "1brs_reference.pdb",
+  "source_sha256": "0076aae54252706a8c8c02f7b1e71ce2394b0e928b413590b4ac12aade9e8f6c",
+  "selected_source_chains": [
+    "A",
+    "D"
+  ],
+  "generated_structure_chains": [
+    "A",
+    "D"
+  ],
+  "groups": {
+    "A": [
+      "A"
+    ],
+    "B": [
+      "D"
+    ]
+  },
+  "af3_chain_ids": [
+    "A",
+    "D"
+  ],
+  "prediction_sequence_mode": "repaired_full_length",
+  "gromacs_chain_ids_expected": [
+    "A",
+    "B"
+  ],
+  "gromacs_to_source_chain": {
+    "A": "A",
+    "B": "D"
+  }
+}

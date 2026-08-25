@@ -1,0 +1,27 @@
+# Editors and OS
+.DS_Store
+.idea/
+~$*
+
+# Local environments
+.venv/
+.worktrees/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Build output. A built wheel belongs to a GitHub Release, never to the tree:
+# its version number stops matching the source the moment the source moves.
+build/
+dist/
+*.egg-info/
+release/
+
+# Sequence-colouring files are an export format, so any that appear in the
+# tree are output someone produced by hand, not source.
+*.scf

@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "molcompose-mcp"
+version = "0.1.1"
+description = "Agent-safe MCP server exposing MolCompose figure commands in UCSF ChimeraX"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "BSD-3-Clause"
+dependencies = ["mcp>=2,<3"]
+# Shields reads pyversions from these, not from requires-python, so without
+# them the README badge renders as "python | missing". PyPI also uses them for
+# its own filtering.
+classifiers = [
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+
+[project.scripts]
+molcompose-mcp = "molcompose_mcp.server:main"
+molcompose-console = "molcompose_mcp.console:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["molcompose_mcp*"]
