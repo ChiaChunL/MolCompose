@@ -817,3 +817,44 @@ def test_the_setup_prompt_does_not_ask_the_agent_to_do_what_it_cannot():
     assert "pipx" in text or "absolute path" in text
     # The real port, not the default.
     assert "3010" in text and "127.0.0.1:3010" in text
+
+
+def test_the_bridge_card_is_filled_in_before_anyone_touches_it():
+    """The command a person is meant to copy was an empty box.
+
+    Both the button label and the `molcompose-mcp --chimerax-url …` snippet are
+    written by `_refresh_bridge_card`, which ran only from the agent combo's
+    change handler and the path field's textChanged. A freshly opened panel
+    fires neither, so the card sat there with a constructed button label and a
+    blank QLabel where the command belongs.
+
+    This asserts the snippet is non-empty after the tab is built, whatever the
+    bridge state.
+    """
+    from src.ui.tool import MolComposeTool
+
+    written = {}
+
+    class _Label:
+        def setText(self, text):
+            written["snippet"] = text
+
+    class _Button:
+        def setText(self, text):
+            written["button"] = text
+
+        def setEnabled(self, _):
+            pass
+
+    stub = type("S", (), {})()
+    stub._bridge_button = _Button()
+    stub._bridge_snippet = _Label()
+
+    MolComposeTool._refresh_bridge_card(stub, None)
+    assert "molcompose-mcp --chimerax-url" in written["snippet"]
+    assert "3000" in written["snippet"]
+    assert written["button"]
+
+    MolComposeTool._refresh_bridge_card(stub, 3010)
+    assert "3010" in written["snippet"]
+    assert "3010" in written["button"]

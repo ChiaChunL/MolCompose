@@ -2142,6 +2142,13 @@ class MolComposeTool(ToolInstance):
         self._build_chat_card(layout)
         self._build_bridge_card(layout)
         layout.addStretch(1)
+        # Both cards read the bridge to fill themselves in, and until now
+        # nothing asked them to until the agent combo changed or someone typed
+        # in the path field. On a freshly opened panel neither happens, so the
+        # button kept its constructed label and the command under "In a
+        # terminal" was an empty box — the one thing on that card a person is
+        # meant to copy.
+        self._refresh_agent_status()
         return tab
 
     def _build_bridge_card(self, layout) -> None:
@@ -2524,7 +2531,7 @@ class MolComposeTool(ToolInstance):
             "listed.\n\n"
             "Step 4. Open PDB 1BRS and characterise the interface "
             "between chains A and D, then show it with the "
-            "Interface (binder loop) preset. Walk me through every number you "
+            "`paratope-closeup` preset. Walk me through every number you "
             "report. For each one: the exact command or sub-step that produced "
             "it, what it means, and its criterion and cutoff. Where a number "
             "has no cutoff, state the convention or formula that defines it "
