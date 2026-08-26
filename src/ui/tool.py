@@ -2489,28 +2489,49 @@ class MolComposeTool(ToolInstance):
         self._set_status("Setup prompt copied — paste it into an MCP client.")
 
     def _setup_prompt_text(self) -> str:
-        """The setup, addressed to an agent, naming the port the bridge is on.
+        """The setup, addressed to an agent, split by who can actually do each step.
 
-        Generated rather than stored. The README's version hard-codes 3000,
-        which is the same assumption that had this panel telling people to
-        start a bridge that was already running on another port; a prompt
-        carrying it would hand an agent an address with nothing behind it.
+        The first version read as one paragraph of instructions and asked the
+        agent to run `toolshed install` and `remotecontrol rest start`. It can
+        do neither: both are outside the bridge's whitelist, and the second
+        could not work anyway because it is the command that *creates* the
+        bridge. An agent handed that tries, fails, and improvises.
+
+        So the steps are numbered and each says whose it is. The port is read
+        from the running bridge rather than assumed, and the agent is told to
+        wait for its own tools to appear — registering an MCP server rarely
+        takes effect until the CLI restarts, and a prompt that ignores that
+        produces an agent confidently calling tools it does not have.
         """
         port = self._bridge_port() or 3000
         return (
-            "Set up MolCompose so you can drive it. In UCSF ChimeraX's command "
-            "line, run `toolshed install ChimeraX_MolCompose`, then tell me to "
-            "restart ChimeraX — a running session keeps the old modules, so the "
-            "panel will not appear until it has. Install the agent bridge with "
-            "`pip install molcompose-mcp`, and register it with yourself as an "
-            "MCP stdio server: the command is `molcompose-mcp` with arguments "
-            f"`--chimerax-url http://127.0.0.1:{port}`. Have me run "
-            f"`remotecontrol rest start port {port} json true` in ChimeraX so "
-            "the bridge has something to talk to. Then check it works: open PDB "
-            "1BRS with `open 1brs`, characterise the interface between chains A "
-            "and D, and walk me through what you get — which command produced "
-            "each number, and what the number means. Tell me the criterion and "
-            "cutoff with every number, because they are not standard."
+            "Help me set up MolCompose, a UCSF ChimeraX bundle you drive "
+            "through an MCP server. The first two steps are mine to run — "
+            "ChimeraX takes no remote install and cannot be told remotely to "
+            "open its own bridge. Ask me for them and wait.\n\n"
+            "Step 1. I run `toolshed install ChimeraX_MolCompose` in ChimeraX, "
+            "then quit it and start it again; a running session keeps the "
+            "modules it already loaded.\n\n"
+            "Step 2. I run `remotecontrol rest start port "
+            f"{port} json true`. Ask me which port it printed — it is not "
+            "always the one asked for.\n\n"
+            "Step 3. Install `molcompose-mcp` and register it with yourself as "
+            "an MCP stdio server, arguments "
+            f"`--chimerax-url http://127.0.0.1:{port}`. Register its absolute "
+            "path: you launch it in your own environment, not the shell that "
+            "installed it. Most CLIs load a new server only at start, so "
+            "restart if you must, and stop until your molcompose tools are "
+            "listed.\n\n"
+            "Step 4. Open PDB 1BRS and characterise the interface "
+            "between chains A and D, then show it with the "
+            "Interface (binder loop) preset. Walk me through every number you "
+            "report. For each one: the exact command or sub-step that produced "
+            "it, what it means, and its criterion and cutoff. Where a number "
+            "has no cutoff, state the convention or formula that defines it "
+            "instead. Also list any analyses that do not apply to this "
+            "structure and why. Where a well-known reference range or "
+            "experimental value exists, give it for comparison. A number "
+            "without its yardstick compares to nothing."
         )
 
     def _set_examples_visible(self, visible: bool) -> None:
