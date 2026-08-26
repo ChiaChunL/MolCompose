@@ -6,15 +6,24 @@ believe.
 
 ## Install
 
-Copy `SKILL.md` into the skills directory your agent reads, for example:
+One file, no dependencies, no client-specific syntax. Drop it wherever your
+agent reads skills from — for Claude Code that is `~/.claude/skills/`:
 
 ```bash
-cp skill/SKILL.md /path/to/your/skills/molcompose/SKILL.md
+mkdir -p ~/.claude/skills/molcompose
+curl -fsSL -o ~/.claude/skills/molcompose/SKILL.md \
+  https://raw.githubusercontent.com/ChiaChunL/MolCompose/main/skill/SKILL.md
 ```
 
-It is one file with no dependencies and no client-specific syntax. Where a
-client has no skills directory, supply the file through that client's normal
-instruction mechanism.
+Where a client has no skills directory, supply the file through whatever
+instruction mechanism it does have.
+
+**You may not need to.** The server sends the rules an agent gets wrong without
+being told — prefer `characterise_interface`, read the `skipped` block, never
+report a number without its criterion and cutoff — to every client on connect,
+whatever it is and with nothing installed. This file is the long form: which
+analysis answers which question, and how to read a disagreement between two of
+them.
 
 ## Why a skill and not just the MCP server
 
@@ -22,11 +31,6 @@ The server validates arguments and refuses inapplicable metrics, which stops an
 agent producing a wrong number. It cannot stop an agent producing an
 *incomplete* one. Benchmarks of agent-driven protein work find that agents pick
 appropriate tools and then evaluate too shallowly, rarely comparing
-alternatives (Kim and Romero 2026). The judgement in `SKILL.md` — run the
-battery, read the skipped block, treat metric disagreement as signal — is what
-closes that gap.
-
-## Status
-
-Draft, 0.1.0. The guidance follows the validated tool contracts and the failure
-modes covered by the test suite.
+alternatives (Kim and Romero 2026). The judgement here — run the battery, read
+the skipped block, treat metric disagreement as signal — is what closes that
+gap.
