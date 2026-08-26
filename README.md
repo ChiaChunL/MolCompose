@@ -84,24 +84,49 @@ pip install molcompose-mcp
 Runs as a separate process and reaches ChimeraX over its REST bridge. See
 [`mcp/`](mcp/) for the client configuration.
 
+The rules an agent gets wrong without being told — prefer
+`characterise_interface`, read the `skipped` block before the numbers, never
+report a count without its criterion and cutoff — reach every client on
+connect, with nothing to install. [`skill/`](skill/) is the long form of that:
+which analysis answers which question, and how to read two of them
+disagreeing. One file, for clients that read a skills directory:
+
+```bash
+mkdir -p ~/.claude/skills/molcompose
+curl -fsSL -o ~/.claude/skills/molcompose/SKILL.md \
+  https://raw.githubusercontent.com/ChiaChunL/MolCompose/main/skill/SKILL.md
+```
+
 #### Setup prompt
 
 If you have an agent CLI already, hand it the setup instead of doing it
 yourself. Paste the following into any MCP-capable client that can run commands:
 
 ```
-Set up MolCompose so you can drive it. In UCSF ChimeraX's command line, run
-`toolshed install ChimeraX_MolCompose`, then tell me to restart ChimeraX — a
-running session keeps the old modules, so the panel will not appear until it
-has. Install the agent bridge with `pip install molcompose-mcp`, and register
-it with yourself as an MCP stdio server: the command is `molcompose-mcp` with
-arguments `--chimerax-url http://127.0.0.1:3000`. Have me run
-`remotecontrol rest start port 3000 json true` in ChimeraX so the bridge has
-something to talk to — if ChimeraX reports another port, use that one in both
-places. Then check it works: open PDB 1BRS with `open 1brs`,
-characterise the interface between chains A and D, and walk me through what you
-get — which command produced each number, and what the number means. Tell me
-the criterion and cutoff with every number, because they are not standard.
+Help me set up MolCompose, a UCSF ChimeraX bundle you drive through an MCP
+server. The first two steps are mine to run — ChimeraX takes no remote install
+and cannot be told remotely to open its own bridge. Ask me for them and wait.
+
+Step 1. I run `toolshed install ChimeraX_MolCompose` in ChimeraX, then quit it
+and start it again; a running session keeps the modules it already loaded.
+
+Step 2. I run `remotecontrol rest start port 3000 json true`. Ask me which port
+it printed — it is not always the one asked for.
+
+Step 3. Install `molcompose-mcp` and register it with yourself as an MCP stdio
+server, arguments `--chimerax-url http://127.0.0.1:3000`. Register its absolute
+path: you launch it in your own environment, not the shell that installed it.
+Most CLIs load a new server only at start, so restart if you must, and stop
+until your molcompose tools are listed.
+
+Step 4. Open PDB 1BRS and characterise the interface between chains A and D,
+then show it with the `paratope-closeup` preset. Walk me through every
+number you report. For each one: the exact command or sub-step that produced
+it, what it means, and its criterion and cutoff. Where a number has no cutoff,
+state the convention or formula that defines it instead. Also list any analyses
+that do not apply to this structure and why. Where a well-known reference range
+or experimental value exists, give it for comparison. A number without its
+yardstick compares to nothing.
 ```
 
 Nothing is downloaded from this repository: the bundle comes from the Toolshed,

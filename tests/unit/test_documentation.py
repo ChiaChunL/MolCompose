@@ -268,3 +268,33 @@ def test_no_document_points_at_an_example_that_is_not_there():
         "documents naming example files that do not exist:\n  "
         + "\n  ".join(missing)
     )
+
+
+def test_the_readme_and_the_panel_give_the_same_setup_prompt():
+    """Two copies of one paragraph, edited by hand, drifted.
+
+    The README's copy is line-wrapped and the panel builds its own from the
+    live bridge port, so they can never be compared byte for byte. They can be
+    compared as prose, and were not: an edit by line range cut a wrapped
+    sentence in half and left "nothing." alone on a line in the README, which
+    is what a reader copies and pastes into their agent.
+    """
+    import re
+    import sys
+
+    sys.path.insert(0, str(ROOT / "tests"))
+    import chimerax_stubs
+
+    chimerax_stubs.install()
+    from src.ui.tool import MolComposeTool
+
+    class _Stub:
+        def _bridge_port(self):
+            return 3000
+
+    panel = re.sub(r"\s+", " ", MolComposeTool._setup_prompt_text(_Stub())).strip()
+
+    readme = (ROOT / "README.md").read_text()
+    start = readme.index("Help me set up MolCompose")
+    block = readme[start:readme.index("```", start)]
+    assert re.sub(r"\s+", " ", block).strip() == panel

@@ -778,3 +778,42 @@ def test_the_footer_recognises_an_agent_that_named_itself():
     assert "✓ 3 MolCompose operation(s) verified" in body
     assert "No live MolCompose analysis" not in body
     assert "clean-cartoon" not in body
+
+
+def test_the_setup_prompt_does_not_ask_the_agent_to_do_what_it_cannot():
+    """`toolshed install` and `remotecontrol rest start` are not the agent's.
+
+    The first version of this prompt read as one paragraph and told the agent
+    to run both. Neither is in the bridge's whitelist, and the second is the
+    command that *creates* the bridge, so it could not work from the other
+    side of one however the whitelist read. An agent given that tries, fails,
+    and improvises — which is worse than being told plainly whose step it is.
+
+    The prompt now numbers its steps and marks each one. This checks the two
+    commands the human has to run are attributed to the human, and that the
+    agent is warned it may not have its tools until it restarts.
+    """
+    from src.ui.tool import MolComposeTool
+
+    class _Stub:
+        def _bridge_port(self):
+            return 3010
+
+    text = MolComposeTool._setup_prompt_text(_Stub())
+
+    for command in ("toolshed install", "remotecontrol rest start"):
+        assert command in text, command
+        # The step carrying it has to be one of the human's.
+        step = next(s for s in text.split("\n\n") if command in s)
+        # The human's steps say "I run"; the agent's are imperative. The voice
+        # is the only marker, so it has to be there.
+        assert "I run" in step, f"{command}: {step[:60]}"
+
+    assert "Step 3." in text and "molcompose-mcp" in text
+    assert "restart" in text.lower()
+    # The client launches the server in its own environment, not the shell that
+    # installed it, so a bare `pip install` into an unactivated venv leaves the
+    # command unfindable. The prompt has to say where to put it.
+    assert "pipx" in text or "absolute path" in text
+    # The real port, not the default.
+    assert "3010" in text and "127.0.0.1:3010" in text
