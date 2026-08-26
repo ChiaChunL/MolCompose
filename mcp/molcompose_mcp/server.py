@@ -510,11 +510,33 @@ def create_server(chimerax_url: str = "http://127.0.0.1:3000",
 
     app = MCPServer(
         "molcompose",
+        # Sent to every client at connect, whatever it is and without the user
+        # installing anything. That makes it the only place guidance reaches an
+        # agent for free — a skill file has to be copied into a directory the
+        # client happens to read, which most do not have. So the few rules an
+        # agent gets wrong without being told live here, and the long-form
+        # judgement lives in the `molcompose://skill` resource below.
         instructions=(
-            "Compose reproducible publication figures of protein structures in UCSF "
-            "ChimeraX through MolCompose. Use run_native only for the whitelisted "
-            "display commands; all figure work goes through the typed tools. Every "
-            "export records a full command recipe and agent provenance."
+            "Analyse protein-protein interfaces and compose reproducible "
+            "publication figures in UCSF ChimeraX through MolCompose.\n\n"
+            "Prefer `characterise_interface`: it runs the whole battery in one "
+            "pass. Picking tools one at a time tends to stop at the first "
+            "plausible answer.\n\n"
+            "Read the `skipped` block before the numbers. A refused metric is "
+            "information, not an omission — report it. Confidence scores are "
+            "refused on experimental structures because a B-factor column is "
+            "not pLDDT; ipSAE, pDockQ2 and LIS are refused without a PAE file "
+            "beside the model. Do not substitute one metric for another, and "
+            "do not compute one yourself from coordinates.\n\n"
+            "Never report a number without its criterion and cutoff — atom "
+            "pairs are not residue pairs, and counts differ several-fold "
+            "between definitions. Never call a predicted interface real on one "
+            "score. Never say a figure was produced when only the view was "
+            "styled.\n\n"
+            "Use run_native only for the whitelisted display commands; all "
+            "figure work goes through the typed tools. Every export records a "
+            "full command recipe and agent provenance. Read "
+            "`molcompose://skill` for which analysis answers which question."
         ),
     )
     client = ChimeraXClient(chimerax_url)
@@ -608,6 +630,26 @@ def create_server(chimerax_url: str = "http://127.0.0.1:3000",
         across both partners, to show which residues carry it), or
         predicted-structure (pLDDT confidence coloring for AlphaFold/ESMFold
         output files, with automatic 0-1 / 0-100 scale detection).
+
+        The rest, which this list used to leave out — half the presets the tool
+        accepts were undiscoverable, so an agent could only reach them by
+        guessing a name. All but metric-map require detect_interface first.
+
+        - licorice-chain: licorice-closeup with each partner's carbons in its
+          own colour, for telling the two sides apart in a close-up.
+        - paratope-closeup: the binder's interface side chains against a plain
+          partner, side-on. Named for a paratope but not restricted to one.
+        - surface-complex: both partners as solid surface in chain colours, for
+          shape rather than residues.
+        - epitope-surface / surface-partner-a: one side drawn as surface with
+          the interface painted on it, the other as cartoon. Which side is
+          which is the only difference.
+        - surface-translucent: the same with the surface see-through, so the
+          backbone underneath stays visible.
+        - surface-epitope-map: the partner surface coloured by per-residue
+          buried area rather than by membership.
+        - metric-map: cartoon coloured by whatever per-residue values are
+          loaded — ddG, MM/PBSA, RMSF. The one preset that needs no interface.
 
         `labels` overrides how many residues per side the preset labels; 0 turns
         them off. Leave it out to keep the preset's own count, which differs

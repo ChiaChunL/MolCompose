@@ -115,3 +115,27 @@ def test_create_server_takes_the_source_by_keyword():
     parameters = inspect.signature(server_module.create_server).parameters
     assert "source" in parameters
     assert parameters["source"].default == "agent"
+
+
+def test_every_preset_the_tool_accepts_is_named_in_its_description(stub_client):
+    """A preset the description omits is one an agent can only reach by guessing.
+
+    `apply_style` takes a free-form string — there is no enum to constrain it —
+    so its docstring is the entire discovery surface. It listed eight of
+    sixteen. The missing half included paratope-closeup, and asking an agent
+    for it by the panel's name for it, "Interface (binder loop)", gave it
+    nothing to map from: neither that phrase nor the slug appeared anywhere in
+    the tool contract.
+
+    This fails whenever a preset is added and the docstring is not.
+    """
+    import asyncio
+
+    from molcompose_mcp.server import PRESETS
+
+    app = server_module.create_server("http://127.0.0.1:65500")
+    tool = {t.name: t for t in asyncio.run(app.list_tools())}["apply_style"]
+    described = tool.description or ""
+
+    missing = sorted(name for name in PRESETS if name not in described)
+    assert not missing, "presets apply_style accepts and does not describe: " + ", ".join(missing)
