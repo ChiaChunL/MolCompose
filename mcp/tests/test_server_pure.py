@@ -242,6 +242,7 @@ def test_model_listing_uses_info_values_when_native_info_logs_are_empty():
                 "residue_count": 1,
             },
         ],
+        "log": "",
     }
 
 
@@ -294,14 +295,20 @@ def test_model_listing_falls_back_to_logs_without_json_values():
     )
 
     assert listing == {
+        "models": [],
+        "chains": [],
         "models_text": "model #1: 1acb.pdb",
         "chains_text": "chain E\nchain I",
         "log": "model #1: 1acb.pdb\nchain E\nchain I",
     }
 
 
-def test_model_listing_returns_empty_mapping_when_discovery_returns_nothing():
-    assert normalise_model_listing(NO_VALUE, NO_VALUE) == {}
+def test_model_listing_keeps_stable_fields_when_discovery_returns_nothing():
+    assert normalise_model_listing(NO_VALUE, NO_VALUE) == {
+        "models": [],
+        "chains": [],
+        "log": "",
+    }
 
 
 # --- return values, not formatted text -----------------------------------
@@ -506,6 +513,32 @@ class TestBlockRows:
         given = [{"kind": "ifaceA", "name": "mc1_ifaceA"}]
         assert name_block_rows(given) == given
 
+    def test_live_chimerax_dataclass_reprs_are_decoded(self):
+        from molcompose_mcp.server import name_block_rows
+
+        rows = name_block_rows([
+            "Block(kind='groupA', name='mc1_groupA', spec='/A', residue_count=1)",
+            (
+                "Block(kind='ifaceA', name='mc1_ifaceA', "
+                "spec='#1/A:27,35,37-38', residue_count=4)"
+            ),
+        ])
+
+        assert rows == [
+            {
+                "kind": "groupA",
+                "name": "mc1_groupA",
+                "label": "Group A chains",
+                "count": 1,
+            },
+            {
+                "kind": "ifaceA",
+                "name": "mc1_ifaceA",
+                "label": "Interface on A",
+                "count": 4,
+            },
+        ]
+
     def test_nothing_useful_is_none(self):
         from molcompose_mcp.server import name_block_rows
 
@@ -544,7 +577,7 @@ def test_export_refuses_to_write_provenance_for_a_figure_that_does_not_exist(
             return {"log messages": {"note": ["file exists; use overwrite true"]}}
 
     monkeypatch.setattr(server_module, "ChimeraXClient", lambda url: RefusingChimeraX())
-    app = server_module.create_server("http://127.0.0.1:9")
+    app = server_module.create_server("http://127.0.0.1:9", launch=False)
     export = app._tool_manager._tools["export_figure"].fn
     target = tmp_path / "never-written.png"
 

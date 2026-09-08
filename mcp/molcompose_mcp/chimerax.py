@@ -17,6 +17,14 @@ class ChimeraXUnavailable(RuntimeError):
     """Raised when the ChimeraX REST bridge cannot be reached."""
 
 
+class ChimeraXCommandError(RuntimeError):
+    """Raised when the bridge ran a command but ChimeraX rejected it."""
+
+    def __init__(self, command: str, message: str):
+        super().__init__(message)
+        self.command = command
+
+
 class ChimeraXClient:
     def __init__(self, base_url: str = "http://127.0.0.1:3000", timeout: float = 120.0):
         self.base_url = base_url.rstrip("/")
@@ -48,6 +56,15 @@ class ChimeraXClient:
 NO_VALUE = object()
 
 
+def error_text(error: object) -> str:
+    """Return the human message from ChimeraX's string or object error form."""
+    if isinstance(error, dict):
+        message = error.get("message")
+        if message:
+            return str(message)
+    return str(error)
+
+
 def log_text(payload: dict) -> str:
     """Flatten whatever log structure the REST bridge returned into one string.
 
@@ -69,7 +86,7 @@ def log_text(payload: dict) -> str:
         parts.extend(str(message) for message in messages)
     error = payload.get("error")
     if error:
-        parts.append(str(error))
+        parts.append(error_text(error))
     return unlink("\n".join(parts))
 
 

@@ -4,7 +4,7 @@ build-backend = "chimerax.bundle_builder.cx_pep517"
 
 [project]
 name = "ChimeraX-MolCompose"
-version = "0.1.2"
+version = "0.1.3"
 description = "Interface analysis and publication-ready figures for solved and predicted complexes, from a panel, the command line, or an LLM agent"
 readme = "README.md"
 license = "BSD-3-Clause"

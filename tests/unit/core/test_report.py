@@ -203,6 +203,13 @@ def test_the_command_count_reads_as_a_sentence():
     )
 
 
+def test_disclosure_names_the_canonical_recipe_as_session_scoped():
+    text = disclosure_text(make_report(command_log=AGENT_LOG))
+    assert "The canonical ChimeraX session recipe" in text
+    assert "The complete command recipe" not in text
+    assert "not limited to the current MCP connection" in text
+
+
 def test_disclosure_survives_a_report_with_no_command_log():
     text = disclosure_text(make_report(command_log=()))
     assert "MolCompose" in text

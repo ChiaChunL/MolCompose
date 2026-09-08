@@ -10,322 +10,197 @@
   <a href="https://cxtoolshed.rbvi.ucsf.edu/apps/chimeraxmolcompose"><img alt="ChimeraX Toolshed" src="https://img.shields.io/badge/ChimeraX-Toolshed-1F5FAF?logo=moleculer&logoColor=white"></a>
   <a href="https://www.rbvi.ucsf.edu/chimerax/"><img alt="ChimeraX 1.12+" src="https://img.shields.io/badge/ChimeraX-1.12%2B-6C8EBF"></a>
   <a href="https://pypi.org/project/molcompose-mcp/"><img alt="molcompose-mcp on PyPI" src="https://img.shields.io/pypi/v/molcompose-mcp?color=12A08C&label=molcompose-mcp&logo=pypi&logoColor=white"></a>
-  <a href="https://pypi.org/project/molcompose-mcp/"><img alt="Python 3.11+" src="https://img.shields.io/badge/python-3.11%2B-4477AA?logo=python&logoColor=white"></a>
-  <a href="https://pypi.org/project/molcompose-mcp/"><img alt="PyPI downloads" src="https://img.shields.io/pypi/dm/molcompose-mcp?color=6C8EBF&label=downloads"></a>
+  <a href="https://pypi.org/project/molcompose-mcp/"><img alt="Supported Python versions" src="https://img.shields.io/pypi/pyversions/molcompose-mcp?color=4477AA&logo=python&logoColor=white"></a>
+  <a href="https://pepy.tech/projects/molcompose-mcp"><img alt="PyPI downloads reported by Pepy" src="https://api.pepy.tech/badge/molcompose-mcp"></a>
   <a href="https://doi.org/10.5281/zenodo.22047284"><img alt="Example dataset DOI" src="https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22047284-1682D4?logo=zenodo&logoColor=white"></a>
   <a href="https://github.com/ChiaChunL/MolCompose/actions/workflows/unit-tests.yml"><img alt="CI" src="https://github.com/ChiaChunL/MolCompose/actions/workflows/unit-tests.yml/badge.svg"></a>
   <a href="https://docs.astral.sh/ruff/"><img alt="Ruff" src="https://img.shields.io/badge/lint-Ruff-D7A00A?logo=ruff&logoColor=white"></a>
-  <a href="LICENSE"><img alt="BSD-3-Clause" src="https://img.shields.io/badge/licence-BSD--3--Clause-7B7BD8"></a>
+  <a href="https://github.com/ChiaChunL/MolCompose/blob/main/LICENSE"><img alt="BSD-3-Clause" src="https://img.shields.io/badge/licence-BSD--3--Clause-7B7BD8"></a>
 </p>
 
-## 🔍 Overview
+**Download statistics:** [PyPI totals (Pepy)](https://pepy.tech/projects/molcompose-mcp) · [ChimeraX Toolshed](https://cxtoolshed.rbvi.ucsf.edu/apps/chimeraxmolcompose).
 
-MolCompose answers the questions asked of a protein–protein interface once a
-structure exists, whether it was solved or predicted: which residues form the
-interface, what holds it together, how much surface it buries, how strong it
-is, which residues carry it, and — for a predicted complex — whether the model
-can be trusted at the interface at all.
+<a id="overview"></a>
 
-It introduces no new analysis method. Interaction typing follows PLIP and
-Arpeggio, binding energetics PRODIGY's IC-NIS model, and interface confidence
-pDockQ2, ipSAE and LIS. MolCompose supplies the detection, the bookkeeping and
-the figure, and names the source of every number it reports.
+## 🔬 Overview
 
-**Three ways in, all reaching the same 26 commands:**
+MolCompose is a UCSF ChimeraX plug-in for protein–protein interface analysis
+and residue-level molecular visualization. It combines native calculations
+with imported results to help researchers inspect interaction details and
+prepare molecular figures.
 
-- a docked panel, one button per question
-- the ChimeraX command line — `molcompose characterise A D`
-- an LLM agent, through the separate [`molcompose-mcp`](mcp/) server
+- Interface residues, buried surface area and chemical interactions.
+- PRODIGY affinity estimates, prediction confidence and reference-based DockQ.
+- Imported Pythia-PPI ΔΔG, MM/PBSA or MM/GBSA contributions, and RMSF.
+- Residue labels, metric-based colouring and figure export.
 
-Every command writes itself to the ChimeraX Log, whichever client issued it, so
-an analysis assembled by clicking or by an agent can be replayed exactly.
-Figures come from 16 named, versioned presets whose colour key is built from
-the same table as the colours on the structure, so the key cannot disagree with
-the figure.
+Use the graphical panel, ChimeraX commands or an agent connected through
+[`molcompose-mcp`](mcp/README.md). Resolved commands are recorded in the ChimeraX
+Log. Metrics that cannot be calculated or mapped remain unavailable.
 
-MolCompose reports nothing it cannot compute: a confidence metric asked of a
-crystal structure is reported as skipped, by name, rather than estimated.
+[Command reference](docs/command-reference.md) · [Worked examples](examples/README.md) · [MCP setup](mcp/README.md)
 
-- **[Command reference](docs/command-reference.md)** — all 26 commands, arguments, returns
-- **[Examples](examples/)** — one worked case you can clone and run
+<a id="installation"></a>
 
 ## 📦 Installation
 
-### From the ChimeraX Toolshed — the normal route
+Tested on macOS with ChimeraX 1.12. The separate MCP process requires Python
+3.11 or later.
 
-Inside ChimeraX, open **Tools → More Tools…**, find MolCompose and install it.
-Or, on the ChimeraX command line:
+### Released packages
 
-```
+In ChimeraX, install through **Tools → More Tools…** or run:
+
+```text
 toolshed install ChimeraX_MolCompose
 ```
 
 Restart ChimeraX, then open **Tools → Structure Analysis → MolCompose**.
-
-### From a wheel
-
-For a version the Toolshed does not serve yet, or to install without it, in
-ChimeraX's own command line:
-
-```
-toolshed install /path/to/chimerax_molcompose-0.1.2-py3-none-any.whl
-```
-
-Restart afterwards. The bundle is not on PyPI and is not meant to be: `pip` is
-the wrong installer for it, and a bundle placed in a system Python is invisible
-to the viewer.
-
-### For agents
+For agent access, install the separate bridge in a terminal:
 
 ```bash
-pip install molcompose-mcp
+python -m pip install --upgrade molcompose-mcp
 ```
 
-Runs as a separate process and reaches ChimeraX over its REST bridge. See
-[`mcp/`](mcp/) for the client configuration.
+### This checkout
 
-The rules an agent gets wrong without being told — prefer
-`characterise_interface`, read the `skipped` block before the numbers, never
-report a count without its criterion and cutoff — reach every client on
-connect, with nothing to install. [`skill/`](skill/) is the long form of that:
-which analysis answers which question, and how to read two of them
-disagreeing. One file, for clients that read a skills directory:
+This README describes bundle **0.1.3** and MCP **0.1.2**, which are not yet
+published. Registry badges show the released versions. To use this checkout,
+run `devel install /path/to/MolCompose exit false` in ChimeraX, wait for
+installation to finish, then restart ChimeraX. From the repository root, run:
 
 ```bash
-mkdir -p ~/.claude/skills/molcompose
-curl -fsSL -o ~/.claude/skills/molcompose/SKILL.md \
-  https://raw.githubusercontent.com/ChiaChunL/MolCompose/main/skill/SKILL.md
+python -m pip install ./mcp
 ```
 
-#### Setup prompt
+Alternatively, install the matching wheel with
+`toolshed install /path/to/chimerax_molcompose-0.1.3-py3-none-any.whl` in ChimeraX.
 
-If you have an agent CLI already, hand it the setup instead of doing it
-yourself. Paste the following into any MCP-capable client that can run commands:
+<a id="quick-start"></a>
 
-```
-Help me set up MolCompose, a UCSF ChimeraX bundle you drive through an MCP
-server. The first two steps are mine to run — ChimeraX takes no remote install
-and cannot be told remotely to open its own bridge. Ask me for them and wait.
+## 🚀 Quick start
 
-Step 1. I run `toolshed install ChimeraX_MolCompose` in ChimeraX, then quit it
-and start it again; a running session keeps the modules it already loaded.
+1. Open a complex, for example `open 1brs`.
+2. Select it under **Structure**, then open the **Interface** tab.
+3. Choose chains A and D and click **Characterise Interface**.
+4. Inspect the results and choose a style in **Compose**.
+5. Use **Export → Export Image** to save the figure.
 
-Step 2. I run `remotecontrol rest start port 3000 json true`. Ask me which port
-it printed — it is not always the one asked for.
+The equivalent analysis command is:
 
-Step 3. Install `molcompose-mcp` and register it with yourself as an MCP stdio
-server, arguments `--chimerax-url http://127.0.0.1:3000`. Register its absolute
-path: you launch it in your own environment, not the shell that installed it.
-Most CLIs load a new server only at start, so restart if you must, and stop
-until your molcompose tools are listed.
-
-Step 4. Open PDB 1BRS and characterise the interface between chains A and D,
-then show it with the `paratope-closeup` preset. Walk me through every
-number you report. For each one: the exact command or sub-step that produced
-it, what it means, and its criterion and cutoff. Where a number has no cutoff,
-state the convention or formula that defines it instead. Also list any analyses
-that do not apply to this structure and why. Where a well-known reference range
-or experimental value exists, give it for comparison. A number without its
-yardstick compares to nothing.
+```text
+molcompose characterise A D distance 4.5
 ```
 
-Nothing is downloaded from this repository: the bundle comes from the Toolshed,
-the bridge from PyPI, and the test structure from the PDB.
+The default contact criterion uses cross-chain non-hydrogen atom pairs within
+4.5 Å. See the [command reference](docs/command-reference.md) for other criteria,
+parameters, presets and export formats.
 
-The agent reaches the same commands the panel's buttons run, and the panel
-reports the operations it verified rather than the agent's account of them.
-Every command it issues is written to the Log as its own, and every figure it
-exports carries the command recipe and an agent-provenance record. The panel's
-**Agent** tab does the same setup with a button, and can run your own
-already-signed-in CLI as a subprocess: MolCompose never embeds a model and
-never stores an API key.
+<a id="agent-access"></a>
 
-While the bridge is running, ChimeraX accepts commands on 127.0.0.1 without
-authentication — from the agent and from anything else on this computer. That
-is a property of ChimeraX's REST control rather than of MolCompose, so stop the
-bridge when you are not using it.
+## 🤖 Agent access
 
-If `pip install molcompose-mcp` reports that no such package exists, it has
-not been published yet; install it from a clone with `pip install ./mcp`.
+### Quick start in the Agent tab
 
-### From a clone, for development
+1. Install the matching bundle and MCP package as above.
+2. Open **Agent** and select an installed, signed-in Codex or Claude Code CLI.
+   If it is not detected, choose its absolute path under **Setup**.
+3. Ask a question. The first send starts the local bridge when needed and uses
+   the seven-tool `assistant` profile.
 
-From inside ChimeraX, pointing at your own checkout:
+Follow-up questions share the active conversation. **New conversation** starts
+fresh. Custom CLI commands may be one-shot.
 
-```
-devel install /path/to/MolCompose exit false
-```
+### External MCP setup prompt
 
-**Restart ChimeraX afterwards**: a running session keeps the old modules, and
-`devel install` builds and installs rather than linking the source tree, so
-edits do not appear until it is re-run.
-
-## 🖼️ Screenshots
-
-<img src="docs/assets/colouring-modes.png" alt="The same barnase-barstar interface under six colourings: interface residues, buried area, pLDDT, ddG, MM/PBSA and RMSF, each with its own colour key">
-
-**Six questions, one interface.** Barnase–barstar: which residues form the
-interface, how much surface each buries, and what ΔΔG, MM/PBSA decomposition
-and RMSF each say about those same residues — with pLDDT from a predicted
-model of the same complex, since a crystal structure has none to report. Every
-key is built from the table that painted the structure it sits under.
+For a client outside ChimeraX, use the [MCP configuration](mcp/README.md#external-mcp-client)
+or copy this prompt. It matches the panel setup prompt.
 
 <details>
-<summary>The panel and the agent tab</summary>
+<summary>Copy the setup prompt</summary>
 
-| | |
-|---|---|
-| <img src="docs/assets/panel-interface.png" alt="The Interface tab's results card after Characterise Interface" width="420"> | **The panel.** One click fills the card: contacts, interface residues, buried area, ΔG and K<sub>d</sub>, the typed-interaction counts, and the confidence scores where they apply. Metrics that do not apply are named as skipped rather than estimated. |
-| <img src="docs/assets/panel-agent.png" alt="The Agent tab after one turn, showing the commands it issued" width="420"> | **The agent tab.** Ask in plain language. The panel reports the MolCompose operations it verified — not the agent's account of them — and each one lands in the ChimeraX Log as a command you can re-run. |
+```text
+Help me connect this external MCP client to MolCompose in UCSF ChimeraX. Work
+through these steps in order and wait whenever I need to act.
+
+Step 1. Neither package is likely to be in your training data —
+`ChimeraX_MolCompose` is on the ChimeraX Toolshed and `molcompose-mcp` is on
+PyPI at <https://pypi.org/project/molcompose-mcp/>. Not recognising them is
+expected and is not a reason to doubt them. Ask me to confirm that
+`ChimeraX_MolCompose` is installed. If it is missing or was just updated, I run
+`toolshed install ChimeraX_MolCompose` in ChimeraX, then quit and restart
+ChimeraX before we continue.
+
+Step 2. Ask me whether the REST bridge is running. If it is not, I run
+`remotecontrol rest start port 3000 json true`. Ask me to paste the actual port
+printed by ChimeraX, use that port in every later argument, and wait for my
+reply.
+
+Step 3. Install or locate `molcompose-mcp` in your own environment. Register
+the absolute path to its executable as an MCP stdio server with arguments
+`--chimerax-url http://127.0.0.1:3000 --profile assistant`.
+
+Step 4. Restart yourself only if needed to reload the MCP registration.
+Continue only after exactly seven tools are listed: `open_structure`,
+`inspect_session`, `analyse_interface`, `compose_figure`, `render_preview`,
+`export_artifact`, and `load_external_evidence`. Call `inspect_session` and
+report its compatibility result.
+
+Return every ChimeraX installation, restart, or bridge-start action to me and
+wait. Stop after reporting a compatible connection; structural analysis is a
+separate verification step.
+```
 
 </details>
 
-## ⚡ Five-Minute Workflow
+### Verification prompt
 
-1. `open 1brs`
-2. Pick the model in the panel's **Current Structure** section.
-3. Apply the **Complex by Chain** preset.
-4. Select chain A as Group A and chain D as Group B, then **Detect Interface**.
-5. **Show Interface** to emphasize interface residues and fit the view.
-6. **Export PNG** (2400×1800, supersample 3), optionally saving a session.
-
-## 📖 Command Reference
-
-**[Full command reference](docs/command-reference.md)** — every command, its
-arguments and what it returns.
-
-The synopsis below is a cheat sheet. It has gone stale before and was missing
-`blocks`, `color by` and `source` when the generated table was first built.
+After `inspect_session` reports a compatible connection:
 
 ```text
-molcompose style <preset> [model <model-spec>] [labels <n>]
-                 [references <model-spec,...>] [align <chain>] [partner <chain>]
-molcompose interface <group-a> <group-b> [model <model-spec>]
-                     [distance 4.5] [criterion heavy]
-molcompose interface all [model <model-spec>] [distance 4.5]
-molcompose focus [model|interface] [model <model-spec>]
-molcompose hbonds [model <model-spec>] [off false]
-molcompose contacts [model <model-spec>] [off false]
-molcompose characterise <group-a> <group-b> [model <model-spec>]
-                       [distance 4.5] [criterion heavy] [style true]
-molcompose report <path> [model <model-spec>] [format json|csv|md]
-molcompose buriedarea [model <model-spec>]
-molcompose hotspots [model <model-spec>] [minArea 10] [top 0]
-                    [metric dsasa|energy]
-molcompose ddg <path> [model <model-spec>] [format tabular|pythia]
-               [statistic min|max|mean] [top 15]
-molcompose energy <decomp.dat> chains <file:model,...> [model <model-spec>]
-                  [top 10] [solvation gb|pb]
-molcompose affinity [model <model-spec>] [temperature 25]
-molcompose interactions [model <model-spec>] [types <list>] [off false]
-                       [saltBridge 4.0] [hydrophobic 4.5]
-                       [piStacking 5.5] [cationPi 6.0]
-molcompose dockq <reference> [model <model-spec>] [chainMap A:C,B:D]
-molcompose capabilities [model <model-spec>] [predictor <name>] [paeFile <path>]
-molcompose confidence [model <model-spec>]
-molcompose ipsae <pae-file> [model <model-spec>] [paeCutoff 10]
-molcompose export <path.png|.tif> [width 2400] [height 1800] [supersample 3]
-                  [transparent false] [saveSession false] [overwrite false]
-                  [dpi 300] [saveRecipe false] [keyFontSize <pixels>]
-molcompose seqcolor [<path.scf>] [model <model-spec>]
-                    [source interface|plddt|ddg|dsasa|bfactor|mmpbsa]
-                    [statistic min|max|mean] [load true|false]
-molcompose reset [model <model-spec>]
+Open PDB 1BRS and characterise the interface between chains A and D. For every
+number, state the producing command or sub-step, what it means, and its
+criterion, cutoff, convention or formula. List every analysis that was skipped
+and explain why.
+
+Call `compose_figure` with goal `binder-closeup`; confirm that it selects the
+tested `paratope-closeup` preset. Then call `render_preview` and inspect whether
+the molecular subject is cropped, the interface is visible, labels overlap, or
+the colour key is unreadable. Report the preview QA and stop for my next
+instruction.
 ```
 
-Presets, in two groups. Whole structure: `clean-cartoon`,
-`complex-by-chain`, `surface-complex` (the whole assembly as a surface, one
-colour per chain — the shape question a ribbon cannot answer), `metric-map`,
-`predicted-structure` (pLDDT confidence coloring with automatic 0–1 / 0–100
-scale detection). Interface, all of which
-need a detected interface first: `interface-focus`, `flat-outline`,
-`licorice-closeup`, `licorice-chain`, `epitope-surface`, `surface-partner-a`,
-`surface-translucent`, `surface-epitope-map`, `paratope-closeup`,
-`hotspot-focus`. The four `surface-*` styles draw one chain group as a
-surface and leave the other a cartoon; which group becomes the surface is
-named by the preset, since chain order is a property of the file rather than
-of the question being asked. Full reference:
-`src/docs/user/commands/molcompose.html` (installed into ChimeraX Help).
+The REST bridge is local but unauthenticated. Stop it when finished with
+`remotecontrol rest stop`. Image preview and export require windowed ChimeraX
+on macOS. See [MCP usage and safety](docs/mcp-reference.md) for details.
 
-The command-only `design-reference` style overlays one or more reference
-structures on a characterised design. It derives the epitope from the active
-interface rather than from hard-coded residue numbers; for example:
-`molcompose style design-reference model #1 references #2,#3 align A partner B`.
+<a id="screenshots"></a>
 
-`molcompose seqcolor` writes the per-residue colouring as an SCF file and loads
-it into the ChimeraX Sequence Viewer, so the same quantity that colours the
-structure can be read along the sequence. Colours come from the functions that
-paint the structure — the AlphaFold band table for pLDDT, the diverging and
-sequential ramps for ΔΔG and buried area, the interface preset's own colours
-for interface membership — so the two views cannot disagree about what a colour
-means. One file per chain, because SCF positions are alignment columns of a
-single sequence; those columns are *not* residue numbers, which is why the
-mapping goes through ChimeraX's own chain sequence (3SGB chain E starts at
-residue 16 and its residue numbers differ from its column numbers in fifteen
-distinct ways).
+## 🖼️ Screenshots
 
-## 🧬 Interface Definition
+<img src="docs/assets/colouring-modes.png" alt="Barnase–barstar interface coloured by interface membership, buried area, prediction confidence, ΔΔG, MM/PBSA and RMSF">
 
-Residues from Group A and Group B are interface residues when any selected
-atom of one lies within the cutoff distance (inclusive) of any selected atom
-of the other. The default `heavy` criterion uses all non-hydrogen atoms with a
-4.5 Å default cutoff; the `cbeta` criterion uses one Cβ point per residue
-(Cα for glycine), where 8.0 Å is the conventional cutoff. The accepted range
-is 2.0–10.0 Å for both. Hydrogens,
-waters, ions, and non-polymer ligands are excluded; groups must not overlap.
-Results are reported with stable ordering.
+Residue-level views of the barnase–barstar example. Prediction confidence is
+shown on an AF3 model; imported values use their corresponding structures.
 
-## 💾 What it exports
+<details>
+<summary>The Interface and Agent tabs</summary>
 
-| | |
-|---|---|
-| **Figure** | PNG or TIFF, sized by print width in millimetres at a chosen dpi |
-| **Session** | an optional `.cxs` beside the image, so the scene reopens as it was |
-| **Recipe** | the commands that produced the figure, in the Log and optionally to a file |
-| **Report** | `molcompose report` in Markdown, JSON or CSV |
-| **Sequence colouring** | SCF, loadable into the ChimeraX Sequence Viewer |
+<img src="docs/assets/panel-interface.png" alt="Interface results card" width="420">
+<img src="docs/assets/panel-agent.png" alt="Agent conversation and recorded commands" width="420">
 
-MolCompose analyses one structure at a time. For batch work over many predicted
-models, see foldmetrics.
+</details>
 
-## 🧪 Examples
+<a id="data-and-license"></a>
 
-[`examples/`](examples/) carries one worked case: barnase–barstar, PDB 1BRS
-chains A and D, with the files each analysis needs and nothing else. The
-Pythia-PPI saturation scan, the MM/PBSA decomposition and RMSF from a 100 ns
-trajectory with the repaired structure they are numbered against, and one
-prediction left exactly as the engine wrote it. It is about a megabyte, so a
-clone is quick and every command in the [examples guide](examples/README.md)
-runs against what is in front of you.
+## 🧪 Data and license
 
-The full dataset, three complexes with six prediction engines each, the
-deposited references and the MD inputs and reports, is archived on Zenodo
-instead.
+[Examples](examples/README.md) include barnase–barstar structures and analysis
+inputs. Archived data are available at [Zenodo](https://doi.org/10.5281/zenodo.22047284).
+MolCompose is distributed under the [BSD-3-Clause license](LICENSE).
 
-> **Example dataset:** <https://doi.org/10.5281/zenodo.22047284>
-
-## 🖥️ Supported Environment
-
-The bundle declares `ChimeraX-Core ~=1.0` and is developed and tested on
-**macOS with ChimeraX 1.12**.
+<a id="citation"></a>
 
 ## 📄 Citation
 
 A manuscript describing MolCompose has been submitted.
-
-<!-- "manuscript", not the journal's name for its article type: naming the
-     type says where it went, and that is not public until it is accepted.
-
-     Three states, three wordings, and they are not interchangeable:
-     "in preparation" until it goes out, "has been submitted" from then, and
-     the reference itself once it is accepted. Not "under review" — that is
-     the editor having sent it to reviewers, a later step, and one you may
-     never be told happened.
-
-     On acceptance: put the reference here, and the PubMed ID into the
-     Toolshed listing's Citation field, which renders it as a formatted
-     citation on that page. -->
-
-## ⚖️ License
-
-BSD-3-Clause. See `LICENSE`.

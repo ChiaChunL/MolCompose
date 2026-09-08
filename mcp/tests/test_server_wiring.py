@@ -81,7 +81,7 @@ def _arguments_for(tool):
 
 
 def test_every_registered_tool_reaches_chimerax(stub_client):
-    app = server_module.create_server("http://127.0.0.1:65500", source="agent:codex")
+    app = server_module.create_server("http://127.0.0.1:65500", source="agent:codex", launch=False)
     tools = asyncio.run(app.list_tools())
     assert tools, "the server registered no tools at all"
 
@@ -102,12 +102,17 @@ def test_the_source_is_declared_to_the_bundle_before_the_command(stub_client):
     `molcompose source …` arms a one-shot declaration that the next command
     consumes, so the order is the whole mechanism.
     """
-    app = server_module.create_server("http://127.0.0.1:65500", source="agent:codex")
+    app = server_module.create_server("http://127.0.0.1:65500", source="agent:codex", launch=False)
     asyncio.run(app.call_tool("open_structure", {"path_or_id": "1brs"}))
 
     issued = [c for client in stub_client for c in client.commands]
     assert issued, "no command was sent"
-    assert issued[0] == "molcompose source agent:codex"
+    # The bundle probe runs before anything else and is not part of the
+    # session: it asks ChimeraX whether it has the command at all, and is not
+    # attributed to anyone because it does nothing.
+    assert issued[0] == "usage molcompose"
+    assert issued[1] == "molcompose source agent:codex"
+    assert issued[2].startswith("open ")
 
 
 def test_create_server_takes_the_source_by_keyword():
@@ -133,9 +138,79 @@ def test_every_preset_the_tool_accepts_is_named_in_its_description(stub_client):
 
     from molcompose_mcp.server import PRESETS
 
-    app = server_module.create_server("http://127.0.0.1:65500")
+    app = server_module.create_server("http://127.0.0.1:65500", launch=False)
     tool = {t.name: t for t in asyncio.run(app.list_tools())}["apply_style"]
     described = tool.description or ""
 
     missing = sorted(name for name in PRESETS if name not in described)
     assert not missing, "presets apply_style accepts and does not describe: " + ", ".join(missing)
+
+
+def test_the_instructions_do_not_point_at_anything_that_is_not_there():
+    """A URI in the instructions is a promise every client is handed.
+
+    `instructions` reaches every client at connect, so a line telling an agent
+    to read `molcompose://skill` is read by all of them — and there were no
+    resources registered at all, so every one of them would have looked and
+    found nothing. This is the same failure the tool descriptions were audited
+    for, arriving through the one surface that is not a tool.
+    """
+    import asyncio
+    import re
+
+    app = server_module.create_server("http://127.0.0.1:65500", launch=False)
+    text = app.instructions or ""
+    promised = set(re.findall(r"molcompose://[\w/-]+", text))
+    served = {str(r.uri) for r in asyncio.run(app.list_resources())}
+    assert promised <= served, (
+        "instructions name resources the server does not serve: "
+        + ", ".join(sorted(promised - served))
+    )
+
+
+def test_the_skill_resource_serves_the_file_that_ships_in_the_wheel():
+    """The skill reaches an agent without anyone installing it.
+
+    A skill file copied into a directory by hand reaches only clients that
+    have such a directory, and only users who went looking. Serving it as a
+    resource reaches anything that speaks MCP with nothing asked of the
+    person. That only works if the file is in the wheel: a resource reading
+    `skill/SKILL.md` would find nothing on an installed copy, because that
+    path exists only in the repository.
+    """
+    import asyncio
+    import tomllib
+    from pathlib import Path
+
+    package = Path(server_module.__file__).with_name("SKILL.md")
+    assert package.is_file(), "SKILL.md is not beside the module that serves it"
+
+    config = tomllib.load((Path(server_module.__file__).parents[1] / "pyproject.toml").open("rb"))
+    declared = config["tool"]["setuptools"]["package-data"]["molcompose_mcp"]
+    assert "SKILL.md" in declared, "not declared as package data, so the wheel omits it"
+
+    app = server_module.create_server("http://127.0.0.1:65500", launch=False)
+    served = {str(r.uri) for r in asyncio.run(app.list_resources())}
+    assert "molcompose://skill" in served
+
+    body = list(asyncio.run(app.read_resource("molcompose://skill")))[0].content
+    assert body == package.read_text(encoding="utf-8")
+    assert "name: molcompose" in body
+
+
+def test_the_two_copies_of_the_skill_are_identical():
+    """One is browsed, one is shipped, and they are the same words.
+
+    skill/SKILL.md is what a person reads on the repository page;
+    molcompose_mcp/SKILL.md is what the wheel carries and the resource serves.
+    Editing either alone would give an agent different guidance from the one
+    the maintainer is reading.
+    """
+    from pathlib import Path
+
+    shipped = Path(server_module.__file__).with_name("SKILL.md")
+    browsed = Path(server_module.__file__).parents[2] / "skill" / "SKILL.md"
+    assert browsed.is_file(), browsed
+    assert shipped.read_bytes() == browsed.read_bytes(), (
+        "skill/SKILL.md and mcp/molcompose_mcp/SKILL.md have drifted"
+    )

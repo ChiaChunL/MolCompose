@@ -297,7 +297,7 @@ def test_chat_footer_reports_only_what_the_agent_ran_this_turn():
     )
     MolComposeTool._report_agent_commands(stub)
     body = "\n".join(stub.written)
-    assert "✓ 2 MolCompose operation(s) verified" in body
+    assert "Observed 2 live MolCompose operations" in body
     assert "molcompose interface A D model #1" in body
     assert "molcompose buriedarea model #1" in body
     assert "clean-cartoon" not in body
@@ -312,9 +312,119 @@ def test_chat_footer_warns_when_the_agent_ran_no_live_analysis():
 
 
 def test_successful_process_without_live_analysis_is_not_marked_complete():
-    assert _agent_run_status(0, 0) == "Answer returned · live analysis not verified"
-    assert _agent_run_status(0, 2) == "Analysis complete  ✓"
+    assert _agent_run_status(0, 0) == "Answer returned · no live operation recorded"
+    assert _agent_run_status(0, 2) == "Answer returned · 2 live operations executed"
     assert _agent_run_status(1, 0) == "Agent failed · exit code 1"
+
+
+class _Transcript:
+    def __init__(self):
+        self.lines = []
+        self.clear_count = 0
+
+    def appendPlainText(self, text):  # noqa: N802 - Qt API spelling
+        self.lines.append(text)
+
+    def clear(self):
+        self.clear_count += 1
+        self.lines.clear()
+
+
+def test_two_chat_turns_append_to_one_transcript_in_order():
+    stub = type("Stub", (), {})()
+    stub._chat_log = _Transcript()
+
+    MolComposeTool._record_user_turn(stub, "Characterise it")
+    MolComposeTool._append_chat(stub, "The interface is 938 Å².")
+    MolComposeTool._record_user_turn(stub, "Mark those hotspots")
+    MolComposeTool._append_chat(stub, "Marked three residues.")
+
+    assert stub._chat_log.clear_count == 0
+    assert stub._chat_log.lines == [
+        "❯ Characterise it",
+        "The interface is 938 Å².",
+        "❯ Mark those hotspots",
+        "Marked three residues.",
+    ]
+
+
+def test_start_failure_uses_the_terminal_path_instead_of_staying_analysing():
+    calls = []
+    stub = type("Stub", (), {
+        "_finish_agent_turn": lambda self, state, detail="", exit_code=1: calls.append(
+            (state, detail, exit_code)
+        )
+    })()
+
+    MolComposeTool._on_chat_error(stub, "failed-to-start")
+
+    assert calls == [("start_failed", "failed-to-start", 1)]
+
+
+def test_new_conversation_drops_session_but_preserves_visible_transcript():
+    from src.core.agent_session import AgentConversation
+
+    stub = type("Stub", (), {})()
+    stub._agent_conversation = AgentConversation("codex", "thread-1", 2, "bind")
+    stub._chat_log = _Transcript()
+    stub._chat_log.lines.append("Earlier answer")
+    stub._chat_details = _Transcript()
+    stub._chat_run_status = _WidgetState()
+
+    MolComposeTool._on_new_agent_conversation(stub)
+
+    assert stub._agent_conversation.session_id is None
+    assert stub._agent_conversation.generation == 3
+    assert stub._chat_log.clear_count == 0
+    assert stub._chat_log.lines == ["Earlier answer", "— New conversation —"]
+    assert stub._chat_details.clear_count == 1
+    assert stub._chat_run_status.text == "New conversation"
+
+
+def test_bridge_button_stops_only_the_bridge_started_by_this_panel():
+    commands = []
+    stub = type("Stub", (), {})()
+    stub._bridge_started_by_panel = True
+    stub._bridge_is_running = lambda: True
+    stub._run_command = commands.append
+    stub._refresh_agent_status = lambda: None
+
+    MolComposeTool._on_start_bridge(stub)
+
+    assert commands == ["remotecontrol rest stop"]
+    assert stub._bridge_started_by_panel is False
+
+
+def test_stop_terminates_the_full_process_tree(monkeypatch):
+    import src.ui.tool as tool_module
+
+    calls = []
+
+    class _Process:
+        def processId(self):  # noqa: N802 - Qt API spelling
+            return 4321
+
+        def kill(self):
+            calls.append("kill")
+
+    stub = type("Stub", (), {})()
+    stub._agent_process = _Process()
+    stub._chat_run_status = _WidgetState()
+    stub._append_chat_detail = calls.append
+    stub._finish_agent_turn = (
+        lambda state, detail="", exit_code=1: calls.append((state, detail, exit_code))
+    )
+    monkeypatch.setattr(
+        tool_module,
+        "terminate_process_tree",
+        lambda pid, **kwargs: calls.append(("tree", pid)),
+    )
+
+    MolComposeTool._on_chat_stop(stub)
+
+    assert ("tree", 4321) in calls
+    assert "kill" in calls
+    assert ("cancelled", "Stopped by user", 1) in calls
 
 
 class _ProcessOutput:
@@ -322,6 +432,9 @@ class _ProcessOutput:
         self.output = output
 
     def readAllStandardOutput(self):  # noqa: N802 - Qt API spelling
+        return self.output
+
+    def readAllStandardError(self):  # noqa: N802 - Qt API spelling
         return self.output
 
 
@@ -335,6 +448,122 @@ class _WidgetState:
 
     def setEnabled(self, enabled):  # noqa: N802 - Qt API spelling
         self.enabled = enabled
+
+
+def test_send_waits_for_a_started_bridge_to_become_observable(monkeypatch):
+    """A bridge start is asynchronous even though the command has returned.
+
+    The send path used to query it again immediately and print both
+    ``starting the agent bridge`` and ``Start the agent bridge first`` for one
+    click.  A delayed state change must instead schedule a readiness check and
+    keep the user's prompt pending.
+    """
+    from Qt import QtCore
+
+    scheduled = []
+
+    class _Timer:
+        @staticmethod
+        def singleShot(delay, callback):  # noqa: N802 - Qt API spelling
+            scheduled.append((delay, callback))
+
+    monkeypatch.setattr(QtCore, "QTimer", _Timer, raising=False)
+
+    class _TextField:
+        @staticmethod
+        def text():
+            return "/opt/bin/codex"
+
+    class _Stub:
+        _agent_process = None
+        _agent_path = _TextField()
+        _agents = ((object(), "/opt/bin/codex"),)
+        _server_executable = "/opt/bin/molcompose-mcp"
+        _bridge_started_by_panel = False
+        _bridge_start_polls = 0
+        _chat_send = _WidgetState()
+
+        def __init__(self):
+            self.chat = []
+            self.commands = []
+            self.bridge_states = iter((False, False))
+
+        def _bridge_is_running(self):
+            return next(self.bridge_states)
+
+        def _append_chat(self, text):
+            self.chat.append(text)
+
+        def _run_quiet(self, command):
+            self.commands.append(command)
+
+        def _refresh_agent_status(self):
+            pass
+
+        def _on_chat_send(self):
+            return MolComposeTool._on_chat_send(self)
+
+    stub = _Stub()
+    stub._on_chat_send()
+
+    assert stub.commands == ["remotecontrol rest start port 3000 json true"]
+    assert stub.chat == ["[starting the agent bridge…]"]
+    assert stub._chat_send.enabled is False
+    assert len(scheduled) == 1
+
+    # The listener still is not observable on the first poll.  Waiting again
+    # must not issue a second `rest start` or fall through to readiness.
+    _, retry = scheduled.pop()
+    retry()
+    assert stub.commands == ["remotecontrol rest start port 3000 json true"]
+    assert stub.chat == ["[starting the agent bridge…]"]
+    assert len(scheduled) == 1
+
+
+def test_send_stops_waiting_when_the_bridge_never_becomes_ready():
+    """A failed listener must not leave Send disabled in a polling loop."""
+
+    class _TextField:
+        @staticmethod
+        def text():
+            return "/opt/bin/codex"
+
+    class _Stub:
+        _agent_process = None
+        _agent_path = _TextField()
+        _agents = ((object(), "/opt/bin/codex"),)
+        _server_executable = "/opt/bin/molcompose-mcp"
+        _bridge_started_by_panel = True
+        _bridge_start_polls = 19
+        _chat_send = _WidgetState()
+
+        def __init__(self):
+            self.chat = []
+            self.commands = []
+
+        @staticmethod
+        def _bridge_is_running():
+            return False
+
+        def _append_chat(self, text):
+            self.chat.append(text)
+
+        def _run_quiet(self, command):
+            self.commands.append(command)
+
+        def _refresh_agent_status(self):
+            pass
+
+    stub = _Stub()
+    MolComposeTool._on_chat_send(stub)
+
+    assert stub.commands == []
+    assert stub.chat == [
+        "[The agent bridge did not become ready. Use Start Agent Bridge "
+        "above, then try again.]"
+    ]
+    assert stub._chat_send.enabled is True
+    assert stub._bridge_start_polls == 0
 
 
 class _CleanupState:
@@ -392,6 +621,26 @@ def test_codex_raw_output_goes_to_details_not_the_answer():
     assert stub.chat == []
 
 
+def test_agent_stderr_redacts_api_keys_before_showing_run_details():
+    api_secret = "top-secret-value"
+    bearer_secret = "bearer-secret-value"
+    stub = _FinishedTurnStub(None, "", ())
+    stub._agent_process = _ProcessOutput(
+        (
+            f'error: {{"api_key": "{api_secret}"}}\n'
+            f'Authorization: Bearer {bearer_secret}\n'
+        ).encode()
+    )
+    stub.details = []
+    stub._append_chat_detail = stub.details.append
+
+    MolComposeTool._on_chat_error_output(stub)
+
+    assert api_secret not in stub.details[0]
+    assert bearer_secret not in stub.details[0]
+    assert "[REDACTED]" in stub.details[0]
+
+
 def test_claude_raw_output_remains_visible_as_the_answer():
     from src.core.agent_cli import get_agent
 
@@ -407,6 +656,19 @@ def test_claude_raw_output_remains_visible_as_the_answer():
     assert stub.chat == ["Claude answer\n"]
 
 
+def test_custom_multiline_answer_is_not_reduced_to_its_last_line():
+    from src.core.agent_cli import custom_agent
+    from src.core.agent_session import adapter_for
+
+    stub = _FinishedTurnStub(None, "First line\nSecond line\n", ())
+    stub._agent_adapter = adapter_for(custom_agent("/opt/bin/other", "{prompt}"))
+    stub._agent_final_messages = ["First line", "Second line"]
+
+    MolComposeTool._on_chat_finished(stub, 0)
+
+    assert stub.chat == ["First line\nSecond line"]
+
+
 def test_agent_finish_uses_final_answer_and_cleans_temporary_state(tmp_path):
     answer = tmp_path / "answer.md"
     answer.write_text("Contacting chains: E–I\n")
@@ -415,7 +677,7 @@ def test_agent_finish_uses_final_answer_and_cleans_temporary_state(tmp_path):
     MolComposeTool._on_chat_finished(stub, 0)
 
     assert stub.chat == ["Contacting chains: E–I"]
-    assert stub._chat_run_status.text == "Analysis complete  ✓"
+    assert stub._chat_run_status.text == "Answer returned · 1 live operation executed"
     assert stub.cleanup_state.cleaned is True
     assert stub._agent_output_directory is None
     assert stub._agent_answer_path is None
@@ -435,6 +697,31 @@ def test_agent_failure_expands_run_details_and_resets_buttons():
     assert stub.details_visibility == [True]
     assert stub._chat_send.enabled is True
     assert stub._chat_stop.enabled is False
+
+
+def test_clean_exit_without_a_final_message_is_reported_as_answer_unavailable():
+    stub = _FinishedTurnStub(None, "", ("command",))
+
+    MolComposeTool._on_chat_finished(stub, 0)
+
+    assert stub._chat_run_status.text == "Answer unavailable · 1 live operation executed"
+
+
+def test_missing_codex_answer_file_never_promotes_raw_jsonl_to_chat(tmp_path):
+    secret = "top-secret-value"
+    stub = _FinishedTurnStub(
+        str(tmp_path / "missing-answer.md"),
+        f'{{"api_key": "{secret}", "type": "diagnostic"}}',
+        (),
+    )
+    stub._agent_final_messages = []
+
+    MolComposeTool._on_chat_finished(stub, 0)
+
+    assert stub.chat == []
+    assert stub._chat_run_status.text == (
+        "Answer unavailable · no assistant message returned"
+    )
 
 
 def test_readable_argv_keeps_the_flags_and_drops_the_paths():
@@ -775,7 +1062,7 @@ def test_the_footer_recognises_an_agent_that_named_itself():
     )
     MolComposeTool._report_agent_commands(stub)
     body = "\n".join(stub.written)
-    assert "✓ 3 MolCompose operation(s) verified" in body
+    assert "Observed 3 live MolCompose operations" in body
     assert "No live MolCompose analysis" not in body
     assert "clean-cartoon" not in body
 
@@ -810,6 +1097,7 @@ def test_the_setup_prompt_does_not_ask_the_agent_to_do_what_it_cannot():
         assert "I run" in step, f"{command}: {step[:60]}"
 
     assert "Step 3." in text and "molcompose-mcp" in text
+    assert "--profile assistant" in text
     assert "restart" in text.lower()
     # The client launches the server in its own environment, not the shell that
     # installed it, so a bare `pip install` into an unactivated venv leaves the
@@ -817,6 +1105,23 @@ def test_the_setup_prompt_does_not_ask_the_agent_to_do_what_it_cannot():
     assert "pipx" in text or "absolute path" in text
     # The real port, not the default.
     assert "3010" in text and "127.0.0.1:3010" in text
+
+    # Setup ends at a verified connection. Scientific acceptance testing is a
+    # separate prompt, otherwise the client can start changing the session
+    # before anyone knows whether it loaded the intended focused profile.
+    assert "Open PDB 1BRS" not in text
+    assert "exactly seven" in text
+    for tool in (
+        "open_structure",
+        "inspect_session",
+        "analyse_interface",
+        "compose_figure",
+        "render_preview",
+        "export_artifact",
+        "load_external_evidence",
+    ):
+        assert tool in text, tool
+    assert "compatibility" in text
 
 
 def test_the_bridge_card_is_filled_in_before_anyone_touches_it():

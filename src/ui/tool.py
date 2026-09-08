@@ -57,15 +57,21 @@ from ..core.agent_cli import (
     CUSTOM_AGENT,
     CUSTOM_KEY,
     DEFAULT_CHIMERAX_URL,
-    build_command,
     custom_agent,
     find_agents,
-    finish_process_input,
     get_agent,
     interactive_command,
     locate,
     readiness,
     write_mcp_config,
+)
+from ..core.agent_process import terminate_process_tree
+from ..core.agent_session import (
+    TurnContext,
+    TurnLifecycle,
+    adapter_for,
+    conversation_for,
+    redact_sensitive_text,
 )
 from ..core.blocks import KINDS as BLOCK_KINDS
 from ..core.blocks import LABELS as BLOCK_LABELS
@@ -90,6 +96,8 @@ HELP_PAGE = "help:user/tools/molcompose.html"
 _TARGETS = ("model", "interface", "faceon", "openbook")
 _CRITERIA = ("heavy", "cbeta", "vdw")
 _CRITERION_DEFAULT_CUTOFF = {"heavy": 4.5, "cbeta": 8.0, "vdw": -0.4}
+_AGENT_BRIDGE_POLL_MS = 100
+_AGENT_BRIDGE_MAX_POLLS = 20
 
 
 def _classify_structure(method, values) -> tuple[str, str]:
@@ -721,7 +729,7 @@ def _readable_argv(argv) -> str:
     """The command that ran, with the paths in it reduced to names.
 
     The flags are worth showing: `--allowedTools mcp__molcompose` is the whole
-    confinement claim, and `--print` is why the turn cannot ask a follow-up.
+    confinement claim, and `--print` identifies the non-interactive turn mode.
     The two absolute paths are not. One is the binary, already named a line
     above by the status strip; the other is a temporary directory with a
     random suffix that differs every turn. Both put a local filesystem into
@@ -737,8 +745,9 @@ def _agent_run_status(exit_code: int, operation_count: int) -> str:
     if exit_code != 0:
         return f"Agent failed · exit code {exit_code}"
     if operation_count == 0:
-        return "Answer returned · live analysis not verified"
-    return "Analysis complete  ✓"
+        return "Answer returned · no live operation recorded"
+    noun = "operation" if operation_count == 1 else "operations"
+    return f"Answer returned · {operation_count} live {noun} executed"
 
 
 class MolComposeTool(ToolInstance):
@@ -2217,7 +2226,7 @@ class MolComposeTool(ToolInstance):
             _hint(
                 "An agent reaches MolCompose through the same validated, "
                 "logged commands as the buttons in this panel, and the panel "
-                "reports the operations it verified rather than the agent's "
+                "reports the live operations it observed rather than the agent's "
                 "account of them. Every figure it exports carries the full "
                 "command recipe and an agent-provenance record."
             )
@@ -2249,7 +2258,16 @@ class MolComposeTool(ToolInstance):
         self._active_agent = None
         self._agent_answer_path = None
         self._agent_output_directory = None
+        self._agent_config_directory = None
         self._agent_raw_output = ""
+        self._agent_stdout_buffer = ""
+        self._agent_final_messages = []
+        self._agent_adapter = None
+        self._agent_conversation = None
+        self._agent_lifecycle = TurnLifecycle()
+        self._agent_timeout = None
+        self._bridge_started_by_panel = False
+        self._bridge_start_polls = 0
 
         chat_card, chat_layout = self._card("Ask in this window")
         chat_layout.addWidget(
@@ -2281,6 +2299,7 @@ class MolComposeTool(ToolInstance):
         self._agent_setup = setup
 
         setup_layout.addWidget(_section("Agent CLI"))
+        agent_row = QHBoxLayout()
         self._agent_combo = QComboBox()
         for agent, resolved in self._agents:
             self._agent_combo.addItem(agent.label, agent.key)
@@ -2293,7 +2312,12 @@ class MolComposeTool(ToolInstance):
         # used to mean the chat box simply never appeared.
         self._agent_combo.addItem(CUSTOM_AGENT.label, CUSTOM_KEY)
         self._agent_combo.currentIndexChanged.connect(self._on_agent_changed)
-        setup_layout.addWidget(self._agent_combo)
+        agent_row.addWidget(self._agent_combo, 1)
+        refresh_agent = QPushButton("Refresh")
+        refresh_agent.setObjectName("tonal")
+        refresh_agent.clicked.connect(self._on_refresh_agents)
+        agent_row.addWidget(refresh_agent)
+        setup_layout.addLayout(agent_row)
 
         setup_layout.addWidget(_section("Executable"))
         path_row = QHBoxLayout()
@@ -2383,6 +2407,10 @@ class MolComposeTool(ToolInstance):
         self._chat_stop.clicked.connect(self._on_chat_stop)
         self._chat_stop.setEnabled(False)
         send_row.addWidget(self._chat_stop)
+        self._chat_new = QPushButton("New conversation")
+        self._chat_new.setObjectName("tonal")
+        self._chat_new.clicked.connect(self._on_new_agent_conversation)
+        send_row.addWidget(self._chat_new)
         chat_layout.addLayout(send_row)
 
         # Two rows of two, each hugging its own text with a stretch after it.
@@ -2434,20 +2462,17 @@ class MolComposeTool(ToolInstance):
         chat_layout.addWidget(self._examples)
         self._set_examples_visible(False)
 
-        # Each turn here is one non-interactive process: it cannot stop to ask
-        # whether a tool call is allowed, which is exactly why the MolCompose
-        # tools are permitted up front and nothing else is, and it cannot
-        # answer a follow-up. A terminal can do both, against this same
-        # session, so the panel hands the command over rather than pretending.
+        # Each turn is still a short-lived non-interactive process, but the
+        # supported CLIs resume their prior session ID so follow-ups retain
+        # context. A terminal remains useful when interactive approvals are
+        # wanted rather than the panel's narrow MolCompose-only permission.
         terminal_button = QPushButton("Copy Terminal Command (interactive)")
         terminal_button.setObjectName("tonal")
         terminal_button.setToolTip(
-            "Turns here are single non-interactive runs — one process per "
-            "question, with the MolCompose tools pre-approved and nothing "
-            "else. This copies the command that starts the same agent as a "
-            "conversation in your terminal, pointed at this same ChimeraX "
-            "session, where it can ask before each tool call and remember "
-            "what you asked before."
+            "The panel keeps follow-up context across short-lived turns and "
+            "pre-approves only MolCompose tools. This copies the interactive "
+            "terminal form, pointed at the same ChimeraX session, where the "
+            "CLI can ask before other tool calls."
         )
         terminal_button.clicked.connect(self._on_copy_terminal_command)
         chat_layout.addWidget(terminal_button)
@@ -2496,49 +2521,49 @@ class MolComposeTool(ToolInstance):
         self._set_status("Setup prompt copied — paste it into an MCP client.")
 
     def _setup_prompt_text(self) -> str:
-        """The setup, addressed to an agent, split by who can actually do each step.
+        """Connect an external MCP client, split by who can do each step.
 
-        The first version read as one paragraph of instructions and asked the
-        agent to run `toolshed install` and `remotecontrol rest start`. It can
-        do neither: both are outside the bridge's whitelist, and the second
-        could not work anyway because it is the command that *creates* the
-        bridge. An agent handed that tries, fails, and improvises.
+        This is deliberately not the Agent tab's own quick start: the panel
+        starts its bridge on first send.  The copyable prompt is for another
+        MCP client, which cannot install a ChimeraX bundle, restart ChimeraX or
+        create the bridge it needs in order to reach the session.
 
-        So the steps are numbered and each says whose it is. The port is read
-        from the running bridge rather than assumed, and the agent is told to
-        wait for its own tools to appear — registering an MCP server rarely
-        takes effect until the CLI restarts, and a prompt that ignores that
-        produces an agent confidently calling tools it does not have.
+        Setup ends at a verified seven-tool assistant profile.  The scientific
+        1BRS smoke test lives separately in the README, so a client cannot
+        start changing the session before its registration is known to work.
         """
         port = self._bridge_port() or 3000
         return (
-            "Help me set up MolCompose, a UCSF ChimeraX bundle you drive "
-            "through an MCP server. The first two steps are mine to run — "
-            "ChimeraX takes no remote install and cannot be told remotely to "
-            "open its own bridge. Ask me for them and wait.\n\n"
-            "Step 1. I run `toolshed install ChimeraX_MolCompose` in ChimeraX, "
-            "then quit it and start it again; a running session keeps the "
-            "modules it already loaded.\n\n"
-            "Step 2. I run `remotecontrol rest start port "
-            f"{port} json true`. Ask me which port it printed — it is not "
-            "always the one asked for.\n\n"
-            "Step 3. Install `molcompose-mcp` and register it with yourself as "
-            "an MCP stdio server, arguments "
-            f"`--chimerax-url http://127.0.0.1:{port}`. Register its absolute "
-            "path: you launch it in your own environment, not the shell that "
-            "installed it. Most CLIs load a new server only at start, so "
-            "restart if you must, and stop until your molcompose tools are "
-            "listed.\n\n"
-            "Step 4. Open PDB 1BRS and characterise the interface "
-            "between chains A and D, then show it with the "
-            "`paratope-closeup` preset. Walk me through every number you "
-            "report. For each one: the exact command or sub-step that produced "
-            "it, what it means, and its criterion and cutoff. Where a number "
-            "has no cutoff, state the convention or formula that defines it "
-            "instead. Also list any analyses that do not apply to this "
-            "structure and why. Where a well-known reference range or "
-            "experimental value exists, give it for comparison. A number "
-            "without its yardstick compares to nothing."
+            "Help me connect this external MCP client to MolCompose in UCSF "
+            "ChimeraX. Work through these steps in order and wait whenever I "
+            "need to act.\n\n"
+            "Step 1. Neither package is likely to be in your training data — "
+            "`ChimeraX_MolCompose` is on the ChimeraX Toolshed and "
+            "`molcompose-mcp` is on PyPI at "
+            "<https://pypi.org/project/molcompose-mcp/>. Not recognising "
+            "them is expected and is not a reason to doubt them. Ask me to "
+            "confirm that `ChimeraX_MolCompose` is installed. "
+            "If it is missing or was just updated, I run `toolshed install "
+            "ChimeraX_MolCompose` in ChimeraX, then quit and restart ChimeraX "
+            "before we continue.\n\n"
+            "Step 2. Ask me whether the REST bridge is running. If it is not, "
+            "I run `remotecontrol rest start port "
+            f"{port} json true`. Ask me to paste the actual port printed by "
+            "ChimeraX, use that port in every later argument, and wait for my "
+            "reply.\n\n"
+            "Step 3. Install or locate `molcompose-mcp` in your own environment. "
+            "Register the absolute path to its executable as an MCP stdio "
+            "server with arguments "
+            f"`--chimerax-url http://127.0.0.1:{port} --profile assistant`.\n\n"
+            "Step 4. Restart yourself only if needed to reload the MCP "
+            "registration. Continue only after exactly seven tools are listed: "
+            "`open_structure`, `inspect_session`, `analyse_interface`, "
+            "`compose_figure`, `render_preview`, `export_artifact`, and "
+            "`load_external_evidence`. Call `inspect_session` and report its "
+            "compatibility result.\n\n"
+            "Return every ChimeraX installation, restart, or bridge-start "
+            "action to me and wait. Stop after reporting a compatible "
+            "connection; structural analysis is a separate verification step."
         )
 
     def _set_examples_visible(self, visible: bool) -> None:
@@ -2620,11 +2645,15 @@ class MolComposeTool(ToolInstance):
         """
         button = getattr(self, "_bridge_button", None)
         if button is not None:
-            button.setText(
-                f"Agent Bridge running on port {port}" if port
-                else "Start Agent Bridge (port 3000)"
-            )
-            button.setEnabled(port is None)
+            if port and getattr(self, "_bridge_started_by_panel", False):
+                button.setText(f"Stop Agent Bridge (port {port})")
+                button.setEnabled(True)
+            else:
+                button.setText(
+                    f"Agent Bridge running on port {port}" if port
+                    else "Start Agent Bridge (port 3000)"
+                )
+                button.setEnabled(port is None)
         snippet = getattr(self, "_bridge_snippet", None)
         if snippet is not None:
             snippet.setText(
@@ -2656,6 +2685,9 @@ class MolComposeTool(ToolInstance):
     def _on_agent_changed(self) -> None:
         """Show the selected agent's own path and arguments in the fields."""
         key = self._agent_combo.currentData()
+        conversation = getattr(self, "_agent_conversation", None)
+        if conversation is not None and conversation.agent_key != key:
+            self._agent_conversation = conversation.reset()
         if key == CUSTOM_KEY:
             saved_path, saved_arguments = self._saved_agent()
             self._agent_path.setText(saved_path)
@@ -2674,6 +2706,47 @@ class MolComposeTool(ToolInstance):
         # so they are shown rather than left a mystery, and not editable.
         # Editing them is what "Custom command" is for.
         self._agent_arguments.setEnabled(False)
+
+    def _on_refresh_agents(self) -> None:
+        """Re-run CLI/server discovery without requiring the panel to reopen."""
+        selected = self._agent_combo.currentData()
+        self._agents = find_agents()
+        self._server_executable = locate("molcompose-mcp")
+        self._agent_combo.blockSignals(True)
+        self._agent_combo.clear()
+        for agent, resolved in self._agents:
+            self._agent_combo.addItem(agent.label, agent.key)
+            self._agent_combo.setItemData(
+                self._agent_combo.count() - 1,
+                resolved,
+                Qt.ItemDataRole.UserRole + 1,
+            )
+        self._agent_combo.addItem(CUSTOM_AGENT.label, CUSTOM_KEY)
+        index = self._agent_combo.findData(selected)
+        self._agent_combo.setCurrentIndex(index if index >= 0 else 0)
+        self._agent_combo.blockSignals(False)
+        self._on_agent_changed()
+        self._refresh_agent_status()
+
+    def _on_new_agent_conversation(self) -> None:
+        """Forget remote context explicitly and start with an empty transcript."""
+        if getattr(self, "_agent_process", None) is not None:
+            return
+        conversation = getattr(self, "_agent_conversation", None)
+        if conversation is not None:
+            self._agent_conversation = conversation.reset()
+        self._chat_log.appendPlainText("— New conversation —")
+        self._chat_details.clear()
+        for name in ("_agent_verified", "_agent_unverified"):
+            label = getattr(self, name, None)
+            if label is not None:
+                label.clear()
+                label.setVisible(False)
+        self._chat_run_status.setText("New conversation")
+
+    def _record_user_turn(self, prompt: str) -> None:
+        """Append rather than replace, so follow-ups remain understandable."""
+        self._chat_log.appendPlainText(f"❯ {prompt}")
 
     def _saved_agent(self) -> tuple[str, str]:
         """The custom executable and arguments remembered from last time."""
@@ -2765,7 +2838,7 @@ class MolComposeTool(ToolInstance):
         key = getattr(agent, "key", "")
         return f"agent:{key}" if key else "agent"
 
-    def _write_agent_config(self, agent):
+    def _write_agent_config(self, agent, directory=None):
         """A temporary MCP config for this session, or None if unneeded."""
         if not agent.supports_mcp_config and not agent.interactive_arguments:
             return None
@@ -2776,7 +2849,11 @@ class MolComposeTool(ToolInstance):
             )
         import tempfile
 
-        folder = Path(tempfile.mkdtemp(prefix="molcompose-agent-"))
+        folder = (
+            Path(directory)
+            if directory is not None
+            else Path(tempfile.mkdtemp(prefix="molcompose-agent-"))
+        )
         config_path = str(folder / "mcp.json")
         # The config names the port the bridge is actually on. Writing the
         # default while ChimeraX listens elsewhere hands the agent an address
@@ -2792,10 +2869,20 @@ class MolComposeTool(ToolInstance):
         if not self._bridge_is_running():
             self._append_chat("[starting the agent bridge…]")
             self._run_quiet("remotecontrol rest start port 3000 json true")
+            self._bridge_started_by_panel = True
+            self._refresh_agent_status()
         try:
             agent, executable = self._selected_agent()
             config_path = self._write_agent_config(agent)
         except ValueError as error:
+            for resource_name in (
+                "_agent_config_directory",
+                "_agent_output_directory",
+            ):
+                resource = getattr(self, resource_name, None)
+                if resource is not None:
+                    resource.cleanup()
+                    setattr(self, resource_name, None)
             self._append_chat(f"[{error}]")
             return
         argv = interactive_command(agent, config_path, executable)
@@ -2819,9 +2906,36 @@ class MolComposeTool(ToolInstance):
         if self._agent_process is not None:
             self._append_chat("[an agent turn is already running]")
             return
+        # ChimeraX starts its REST server in a background Task.  The command
+        # returns after allocating that task, before its HTTPServer has always
+        # published `server_address`.  Falling straight through to readiness
+        # in that window produced two contradictory lines for one click:
+        # "starting" immediately followed by "Start the agent bridge first".
         if not self._bridge_is_running():
-            self._append_chat("[starting the agent bridge…]")
-            self._run_quiet("remotecontrol rest start port 3000 json true")
+            if self._bridge_start_polls == 0:
+                self._append_chat("[starting the agent bridge…]")
+                self._run_quiet("remotecontrol rest start port 3000 json true")
+                self._bridge_started_by_panel = True
+                self._chat_send.setEnabled(False)
+                self._refresh_agent_status()
+            self._bridge_start_polls += 1
+            if self._bridge_start_polls >= _AGENT_BRIDGE_MAX_POLLS:
+                self._bridge_start_polls = 0
+                self._chat_send.setEnabled(True)
+                self._refresh_agent_status()
+                self._append_chat(
+                    "[The agent bridge did not become ready. Use Start Agent "
+                    "Bridge above, then try again.]"
+                )
+                return
+            from Qt.QtCore import QTimer
+
+            QTimer.singleShot(_AGENT_BRIDGE_POLL_MS, self._on_chat_send)
+            return
+        if self._bridge_start_polls:
+            self._bridge_start_polls = 0
+            self._chat_send.setEnabled(True)
+            self._refresh_agent_status()
         # A typed or browsed path counts as an agent found: the point of the
         # field is that auto-detection is not the only way to have one.
         chosen = self._agent_path.text().strip()
@@ -2839,9 +2953,16 @@ class MolComposeTool(ToolInstance):
 
         try:
             agent, executable = self._selected_agent()
-            config_path = (
-                self._write_agent_config(agent) if agent.supports_mcp_config else None
-            )
+            self._agent_config_directory = None
+            if agent.supports_mcp_config:
+                self._agent_config_directory = tempfile.TemporaryDirectory(
+                    prefix="molcompose-agent-config-"
+                )
+                config_path = self._write_agent_config(
+                    agent, self._agent_config_directory.name
+                )
+            else:
+                config_path = None
             self._agent_output_directory = None
             self._agent_answer_path = None
             if agent.final_message_arguments:
@@ -2851,29 +2972,41 @@ class MolComposeTool(ToolInstance):
                 self._agent_answer_path = str(
                     Path(self._agent_output_directory.name) / "answer.md"
                 )
-            argv = build_command(
-                agent,
-                prompt,
-                config_path,
-                executable,
-                self._agent_answer_path,
+            context = TurnContext(
+                agent=agent,
+                executable=executable,
+                config_path=config_path,
+                answer_path=self._agent_answer_path,
                 server_executable=self._server_executable,
                 chimerax_url=self._bridge_url(),
                 source=self._agent_source(agent),
             )
+            self._agent_conversation = conversation_for(
+                self._agent_conversation, context
+            )
+            self._agent_adapter = adapter_for(agent)
+            if self._agent_conversation.session_id:
+                turn = self._agent_adapter.resume_turn(
+                    prompt, self._agent_conversation, context
+                )
+            else:
+                turn = self._agent_adapter.start_turn(prompt, context)
+            argv = turn.argv
         except ValueError as error:
             self._append_chat(f"[{error}]")
             return
 
-        self._chat_log.setPlainText(f"❯ {prompt}\n")
+        self._record_user_turn(prompt)
         self._chat_details.clear()
         self._agent_verified.clear()
         self._agent_verified.setVisible(False)
         self._agent_unverified.clear()
         self._agent_unverified.setVisible(False)
         self._set_chat_details_visible(False)
-        self._chat_run_status.setText(f"{agent.label} is analysing…")
+        self._chat_run_status.setText(f"Connecting to {agent.label}…")
         self._append_chat_detail(f"[running: {_readable_argv(argv)}]")
+        for warning in turn.warnings:
+            self._append_chat_detail(f"[note: {warning}]")
         # The full argv, with both absolute paths, goes to the Log — where a
         # "which binary actually ran" question is answered — rather than into
         # a box people screenshot.
@@ -2884,12 +3017,17 @@ class MolComposeTool(ToolInstance):
         self._chat_input.clear()
         self._chat_send.setEnabled(False)
         self._chat_stop.setEnabled(True)
+        self._chat_new.setEnabled(False)
         self._active_agent = agent
         self._agent_raw_output = ""
+        self._agent_stdout_buffer = ""
+        self._agent_final_messages = []
 
         process = QProcess()
-        process.setProcessChannelMode(QProcess.ProcessChannelMode.MergedChannels)
+        process.setProcessChannelMode(QProcess.ProcessChannelMode.SeparateChannels)
         process.readyReadStandardOutput.connect(self._on_chat_output)
+        process.readyReadStandardError.connect(self._on_chat_error_output)
+        process.errorOccurred.connect(self._on_chat_error)
         process.finished.connect(self._on_chat_finished)
         self._agent_process = process
         # Locked while a turn runs. The dropdown was live throughout, so the
@@ -2898,8 +3036,38 @@ class MolComposeTool(ToolInstance):
         # written for the next turn would all describe the wrong one. Send was
         # already refused; the display was not.
         self._set_agent_choice_enabled(False)
+
+        from Qt.QtCore import QTimer
+
+        timer = QTimer()
+        timer.setSingleShot(True)
+        timer.timeout.connect(self._on_chat_timeout)
+        timer.start(300_000)
+        self._agent_timeout = timer
+        resources = tuple(
+            resource
+            for resource in (
+                self._agent_config_directory,
+                self._agent_output_directory,
+            )
+            if resource is not None
+        )
+
+        def cleanup_resources():
+            for resource in resources:
+                resource.cleanup()
+
+        self._agent_lifecycle.begin(
+            close_stdin=process.closeWriteChannel,
+            stop_timer=timer.stop,
+            cleanup=cleanup_resources,
+        )
         process.start(argv[0], argv[1:])
-        finish_process_input(process, agent, prompt)
+        if turn.stdin is not None:
+            process.write(turn.stdin)
+            process.closeWriteChannel()
+        elif agent.close_stdin_after_prompt:
+            process.closeWriteChannel()
 
     def _on_chat_output(self) -> None:
         if self._agent_process is None:
@@ -2909,9 +3077,72 @@ class MolComposeTool(ToolInstance):
         )
         if chunk.strip():
             self._agent_raw_output += chunk
-            self._append_chat_detail(chunk)
-            if not getattr(self._active_agent, "final_message_arguments", ()):
-                self._append_chat(chunk)
+            if getattr(self, "_agent_adapter", None) is None:
+                self._append_chat_detail(chunk)
+                if not getattr(self._active_agent, "final_message_arguments", ()):
+                    self._append_chat(chunk)
+                return
+            self._chat_run_status.setText("Analysing…")
+            self._agent_stdout_buffer += chunk
+            while "\n" in self._agent_stdout_buffer:
+                line, self._agent_stdout_buffer = self._agent_stdout_buffer.split(
+                    "\n", 1
+                )
+                self._consume_agent_line(line)
+
+    def _consume_agent_line(self, line: str) -> None:
+        if not line.strip() or self._agent_adapter is None:
+            return
+        for event in self._agent_adapter.consume_line(line):
+            if event.kind == "session":
+                self._agent_conversation = self._agent_conversation.with_session(
+                    event.value
+                )
+            elif event.kind == "final":
+                self._agent_final_messages.append(event.value)
+                self._chat_run_status.setText("Preparing answer…")
+            elif event.kind == "phase":
+                self._chat_run_status.setText(event.value)
+            elif event.kind == "warning":
+                self._append_chat_detail(f"[protocol warning: {event.value}]")
+            else:
+                self._append_chat_detail(event.value)
+
+    def _on_chat_error_output(self) -> None:
+        if self._agent_process is None:
+            return
+        chunk = bytes(self._agent_process.readAllStandardError()).decode(
+            "utf-8", errors="replace"
+        )
+        if chunk.strip():
+            self._append_chat_detail(redact_sensitive_text(chunk))
+
+    def _on_chat_error(self, error) -> None:
+        text = str(error)
+        process = getattr(self, "_agent_process", None)
+        if process is not None:
+            try:
+                text = process.errorString() or text
+            except Exception:  # noqa: BLE001 - QProcess may already be gone
+                pass
+        process_errors = getattr(QProcess, "ProcessError", None)
+        failed_to_start = getattr(process_errors, "FailedToStart", None)
+        state = (
+            "start_failed"
+            if error == failed_to_start or "start" in text.lower()
+            else "failed"
+        )
+        self._finish_agent_turn(state, text, 1)
+
+    def _on_chat_timeout(self) -> None:
+        process = self._agent_process
+        if process is not None:
+            terminate_process_tree(int(process.processId()), grace_seconds=0.2)
+        self._finish_agent_turn(
+            "timed_out", "The Agent turn exceeded 5 minutes", 1
+        )
+        if process is not None:
+            process.kill()
 
     def _recipe_log(self) -> tuple:
         from ..commands import recipe_log
@@ -2928,8 +3159,9 @@ class MolComposeTool(ToolInstance):
         agent's own account of its tool calls is not evidence — it is more text
         from the same source as the answer. These lines come from the recipe:
         the commands that reached this session, tagged `agent` because the
-        bridge declared itself before each one, in the order they arrived. An
-        agent that claims a measurement it never took has nothing here.
+        bridge declared itself before each one, in the order they arrived. This
+        establishes which operations executed; it does not independently check
+        the scientific values returned by those operations.
 
         Reading MolCompose's record rather than the CLI's output also keeps
         this working for every agent the panel can launch. Parsing tool calls
@@ -2941,7 +3173,7 @@ class MolComposeTool(ToolInstance):
         if not commands:
             warning = (
                 "⚠ No live MolCompose analysis was recorded for this turn. "
-                "Do not treat the answer as verified against the open ChimeraX window."
+                "The answer is not grounded by an operation in this ChimeraX window."
             )
             unverified = getattr(self, "_agent_unverified", None)
             if unverified is not None:
@@ -2950,7 +3182,7 @@ class MolComposeTool(ToolInstance):
             else:
                 self._append_chat(f"\n[{warning}]")
             return ()
-        heading = f"✓ {len(commands)} MolCompose operation(s) verified"
+        heading = f"Observed {len(commands)} live MolCompose operations"
         body = "\n".join(f"  {command}" for command in commands)
         verified = getattr(self, "_agent_verified", None)
         if verified is not None:
@@ -2963,33 +3195,94 @@ class MolComposeTool(ToolInstance):
         return tuple(commands)
 
     def _on_chat_finished(self, exit_code=0, _status=None) -> None:
+        state = "succeeded" if exit_code == 0 else "failed"
+        MolComposeTool._finish_agent_turn(self, state, "", exit_code)
+
+    def _finish_agent_turn(
+        self, state: str, detail: str = "", exit_code: int = 0
+    ) -> None:
+        lifecycle = getattr(self, "_agent_lifecycle", None)
+        if lifecycle is not None and not lifecycle.active:
+            return
+        buffer = getattr(self, "_agent_stdout_buffer", "")
+        if buffer.strip() and getattr(self, "_agent_adapter", None) is not None:
+            self._consume_agent_line(buffer)
+            self._agent_stdout_buffer = ""
+
+        answer = ""
         if self._agent_answer_path:
             answer_path = Path(self._agent_answer_path)
             if answer_path.is_file():
                 answer = answer_path.read_text(encoding="utf-8").strip()
-                if answer:
-                    self._append_chat(answer)
-            elif exit_code == 0 and self._agent_raw_output.strip():
-                self._append_chat(self._agent_raw_output)
+            elif getattr(self, "_agent_final_messages", None):
+                answer = self._agent_final_messages[-1].strip()
+        elif (
+            getattr(getattr(self, "_agent_adapter", None), "protocol", None)
+            == "plain"
+            and self._agent_raw_output.strip()
+        ):
+            answer = self._agent_raw_output.strip()
+        elif getattr(self, "_agent_final_messages", None):
+            answer = self._agent_final_messages[-1].strip()
+        elif (
+            exit_code == 0
+            and self._agent_raw_output.strip()
+            and getattr(self, "_agent_adapter", None) is None
+        ):
+            answer = self._agent_raw_output.strip()
+        if answer:
+            self._append_chat(answer)
+
         commands = self._report_agent_commands()
-        self._chat_run_status.setText(_agent_run_status(exit_code, len(commands)))
-        if exit_code != 0:
+        if state == "succeeded":
+            if answer:
+                status = _agent_run_status(exit_code, len(commands))
+            elif commands:
+                noun = "operation" if len(commands) == 1 else "operations"
+                status = (
+                    f"Answer unavailable · {len(commands)} live {noun} executed"
+                )
+            else:
+                status = "Answer unavailable · no assistant message returned"
+        elif state == "cancelled":
+            status = "Stopped"
+        elif state == "timed_out":
+            status = "Timed out · you can send again"
+        elif state == "start_failed":
+            status = "Could not start Agent · check Run details"
+        else:
+            status = _agent_run_status(exit_code or 1, len(commands))
+        self._chat_run_status.setText(status)
+        if state != "succeeded":
+            if detail:
+                self._append_chat_detail(f"[{detail}]")
             self._set_chat_details_visible(True)
-        if self._agent_output_directory is not None:
+        if lifecycle is not None:
+            lifecycle.finish(state, detail)
+        elif self._agent_output_directory is not None:
             self._agent_output_directory.cleanup()
         self._agent_output_directory = None
+        self._agent_config_directory = None
         self._agent_answer_path = None
         self._active_agent = None
+        self._agent_adapter = None
+        self._agent_timeout = None
         self._agent_process = None
         self._set_agent_choice_enabled(True)
         self._chat_send.setEnabled(True)
         self._chat_stop.setEnabled(False)
+        chat_new = getattr(self, "_chat_new", None)
+        if chat_new is not None:
+            chat_new.setEnabled(True)
 
     def _on_chat_stop(self) -> None:
         if self._agent_process is not None:
-            self._agent_process.kill()
+            process = self._agent_process
+            terminate_process_tree(int(process.processId()), grace_seconds=0.2)
             self._chat_run_status.setText("Stopping…")
             self._append_chat_detail("[stopped]")
+            self._finish_agent_turn("cancelled", "Stopped by user", 1)
+            process.kill()
 
     # -- callbacks ---------------------------------------------------------
 
@@ -4571,7 +4864,16 @@ class MolComposeTool(ToolInstance):
         self._run_command(focus_command(spec, "interface"))
 
     def _on_start_bridge(self) -> None:
-        self._run_command("remotecontrol rest start port 3000 json true")
+        if (
+            self._bridge_is_running()
+            and getattr(self, "_bridge_started_by_panel", False)
+        ):
+            self._run_command("remotecontrol rest stop")
+            self._bridge_started_by_panel = False
+        elif not self._bridge_is_running():
+            self._run_command("remotecontrol rest start port 3000 json true")
+            self._bridge_started_by_panel = True
+        self._refresh_agent_status()
 
     def _on_print_size(self) -> None:
         """Keep the pixel width and the stated print size in agreement."""

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "molcompose-mcp"
-version = "0.1.1"
+version = "0.1.2"
 description = "Agent-safe MCP server exposing MolCompose figure commands in UCSF ChimeraX"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -28,3 +28,10 @@ molcompose-console = "molcompose_mcp.console:main"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["molcompose_mcp*"]
+
+# SKILL.md is served as the `molcompose://skill` resource, so it has to be in
+# the wheel — a resource reading a file that shipped only in the repository
+# would find nothing on an installed copy. `skill/SKILL.md` stays the one a
+# person browses; a test keeps the two byte-identical.
+[tool.setuptools.package-data]
+molcompose_mcp = ["SKILL.md"]

@@ -17,10 +17,12 @@ def test_installed_help_pages_exist():
     assert (ROOT / "src/docs/user/tools/molcompose.html").is_file()
 
 
-def test_readme_documents_every_command():
+def test_readme_links_to_the_complete_command_reference():
     readme = (ROOT / "README.md").read_text()
+    assert "](docs/command-reference.md)" in readme
+    reference = (ROOT / "docs/command-reference.md").read_text()
     for name in COMMAND_NAMES:
-        assert name in readme, name
+        assert name in reference, name
 
 
 def test_contributing_states_public_layout_and_governance():
@@ -295,6 +297,35 @@ def test_the_readme_and_the_panel_give_the_same_setup_prompt():
     panel = re.sub(r"\s+", " ", MolComposeTool._setup_prompt_text(_Stub())).strip()
 
     readme = (ROOT / "README.md").read_text()
-    start = readme.index("Help me set up MolCompose")
+    start = readme.index("Help me connect this external MCP client")
     block = readme[start:readme.index("```", start)]
     assert re.sub(r"\s+", " ", block).strip() == panel
+
+
+def test_agent_onboarding_separates_panel_external_setup_and_verification():
+    """Each entry point should ask the user for only the work it needs.
+
+    The panel starts its own bridge on first send.  External MCP clients need
+    the human to start that bridge, and 1BRS is an acceptance test after the
+    connection exists rather than part of installing it.
+    """
+    readme = (ROOT / "README.md").read_text()
+
+    assert "Quick start in the Agent tab" in readme
+    assert "External MCP setup prompt" in readme
+    assert "Verification prompt" in readme
+
+    setup_start = readme.index("Help me connect this external MCP client")
+    setup = readme[setup_start:readme.index("```", setup_start)]
+    assert "remotecontrol rest start" in setup
+    assert "1BRS" not in setup
+
+    verification_start = readme.index("Open PDB 1BRS")
+    verification = readme[
+        verification_start:readme.index("```", verification_start)
+    ]
+    assert "compose_figure" in verification
+    assert "binder-closeup" in verification
+    assert "paratope-closeup" in verification
+    assert "render_preview" in verification
+    assert "export" not in verification.lower()

@@ -97,3 +97,11 @@ def test_a_clean_interface_command_still_builds():
 
 def test_run_native_still_refuses_chaining():
     assert not native_allowed("view #1; delete #1")
+
+
+@pytest.mark.parametrize(
+    "command",
+    ("version; open 1crn", "version\nopen 1crn", "version\rclose all"),
+)
+def test_run_native_rejects_every_command_separator_after_a_valid_verb(command):
+    assert not native_allowed(command)
