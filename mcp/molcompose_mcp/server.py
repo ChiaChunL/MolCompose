@@ -78,7 +78,7 @@ from .contracts import (
     TopCount,
 )
 from .launch import BUNDLE_MISSING, ChimeraXNotFound, bridge_is_up, bundle_is_missing, start
-from .output_contract import preserve_output_fields
+from .output_contract import preserve_output_fields, report_tool_errors
 from .presentation import present_analysis
 from .recipe import RecipeLog, build_provenance, read_canonical_recipe
 from .validate import (
@@ -677,7 +677,7 @@ def create_server(chimerax_url: str = "http://127.0.0.1:3000",
                     if options.get("structured_output")
                     else function
                 )
-                app.tool(**options)(registered)
+                app.tool(**options)(report_tool_errors(registered))
             return function
         return register
 

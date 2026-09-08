@@ -9,6 +9,8 @@ from pathlib import Path
 from urllib.parse import urlencode
 from urllib.request import urlopen
 
+import pytest
+
 import scripts.agent_behavior_eval as agent_eval
 from scripts.agent_behavior_eval import (
     DEFAULT_SCENARIOS,
@@ -761,6 +763,92 @@ def test_recoverable_failure_fixture_returns_a_user_facing_error_not_a_traceback
     assert "Traceback" not in json.dumps(payload)
 
 
+def _png_pixels(payload):
+    assert payload.startswith(b"\x89PNG\r\n\x1a\n")
+    width, height = struct.unpack(">II", payload[16:24])
+    offset = 8
+    compressed = bytearray()
+    while offset < len(payload):
+        length = struct.unpack(">I", payload[offset:offset + 4])[0]
+        kind = payload[offset + 4:offset + 8]
+        data = payload[offset + 8:offset + 8 + length]
+        checksum = struct.unpack(">I", payload[offset + 8 + length:offset + 12 + length])[0]
+        assert checksum == zlib.crc32(kind + data)
+        if kind == b"IDAT":
+            compressed.extend(data)
+        offset += 12 + length
+    rows = zlib.decompress(bytes(compressed))
+    assert len(rows) == height * (1 + width * 3)
+
+    def pixel(x, y):
+        start = y * (1 + width * 3)
+        assert rows[start] == 0
+        index = start + 1 + x * 3
+        return tuple(rows[index:index + 3])
+
+    return width, height, pixel
+
+
+def test_preview_png_preserves_shape_boundaries_overlap_and_hotspot_priority():
+    width, height, pixel = _png_pixels(agent_eval._preview_png(120, 90))
+
+    assert (width, height) == (120, 90)
+    for point, colour in [
+        ((0, 0), (246, 247, 250)),
+        ((17, 45), (246, 247, 250)),
+        ((18, 45), (66, 133, 244)),
+        ((30, 45), (66, 133, 244)),
+        ((60, 40), (126, 87, 194)),
+        ((90, 45), (255, 167, 38)),
+        ((102, 45), (255, 167, 38)),
+        ((103, 45), (246, 247, 250)),
+        ((48, 14), (246, 247, 250)),
+        ((48, 15), (66, 133, 244)),
+        ((40, 16), (246, 247, 250)),
+        ((41, 16), (66, 133, 244)),
+        ((48, 75), (66, 133, 244)),
+        ((48, 76), (246, 247, 250)),
+        ((60, 24), (211, 47, 47)),
+        ((60, 23), (126, 87, 194)),
+        ((62, 25), (211, 47, 47)),
+        ((63, 25), (126, 87, 194)),
+        ((60, 45), (211, 47, 47)),
+    ]:
+        assert pixel(*point) == colour, point
+
+
+@pytest.mark.parametrize(
+    ("width", "height", "edge_x", "edge_y"),
+    [(120, 120, 42, 21), (120, 60, 39, 11), (127, 103, 43, 18)],
+)
+def test_preview_png_respects_ellipse_aspect_ratio(width, height, edge_x, edge_y):
+    _, _, pixel = _png_pixels(agent_eval._preview_png(width, height))
+
+    assert pixel(edge_x - 1, edge_y) == (246, 247, 250)
+    assert pixel(edge_x, edge_y) == (66, 133, 244)
+
+
+@pytest.mark.parametrize(
+    ("width", "height", "cropped", "expected_rows"),
+    [
+        (1, 1, False, [[(211, 47, 47)]]),
+        (1, 1, True, [[(126, 87, 194)]]),
+        (2, 3, True, [
+            [(246, 247, 250), (246, 247, 250)],
+            [(246, 247, 250), (66, 133, 244)],
+            [(246, 247, 250), (246, 247, 250)],
+        ]),
+    ],
+)
+def test_preview_png_clips_shapes_to_small_images(width, height, cropped, expected_rows):
+    actual_width, actual_height, pixel = _png_pixels(
+        agent_eval._preview_png(width, height, cropped=cropped)
+    )
+
+    assert (actual_width, actual_height) == (width, height)
+    assert [[pixel(x, y) for x in range(width)] for y in range(height)] == expected_rows
+
+
 def test_cropped_preview_fixture_places_only_a_subject_sliver_at_the_right_edge(
     tmp_path,
 ):
@@ -772,27 +860,14 @@ def test_cropped_preview_fixture_places_only_a_subject_sliver_at_the_right_edge(
             assert json.loads(response.read())["error"] is None
         payload = preview.read_bytes()
 
-    width, height = struct.unpack(">II", payload[16:24])
-    offset = 8
-    compressed = bytearray()
-    while offset < len(payload):
-        length = struct.unpack(">I", payload[offset:offset + 4])[0]
-        kind = payload[offset + 4:offset + 8]
-        data = payload[offset + 8:offset + 8 + length]
-        if kind == b"IDAT":
-            compressed.extend(data)
-        offset += 12 + length
-    rows = zlib.decompress(bytes(compressed))
-
-    def pixel(x, y):
-        start = y * (1 + width * 3)
-        assert rows[start] == 0
-        index = start + 1 + x * 3
-        return tuple(rows[index:index + 3])
-
+    width, height, pixel = _png_pixels(payload)
     background = (246, 247, 250)
     assert pixel(width // 2, height // 2) == background
     assert pixel(width - 1, height // 2) != background
+    assert pixel(89, 45) == background
+    assert pixel(90, 45) == (66, 133, 244)
+    assert pixel(105, 25) == background
+    assert pixel(106, 25) == (66, 133, 244)
 
 
 def test_stream_evaluation_combines_real_call_order_exit_and_final_answer():

@@ -8,6 +8,10 @@ on:
 jobs:
   unit-tests:
     runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        mcp: ["mcp==2.0.0", "mcp>=2,<3"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -23,10 +27,11 @@ jobs:
           # ChimeraX on a CI runner, so the project cannot be built at all —
           # only its dependencies installed.
           python -m pip install $(python -c "import tomllib; print(' '.join(tomllib.load(open('pyproject.toml','rb'))['project']['optional-dependencies']['test']))")
-          python -m pip install -e ./mcp
+          python -m pip install -e ./mcp "${{ matrix.mcp }}"
+          python -m pip show mcp pydantic
       - name: Ruff
-        run: ruff check src tests mcp
+        run: python -m ruff check src tests mcp
       - name: Pytest (host-light)
-        run: pytest tests mcp/tests
+        run: python -m pytest tests mcp/tests
       - name: Whitespace hygiene
         run: git diff --check
