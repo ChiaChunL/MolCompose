@@ -12,7 +12,7 @@
   <a href="https://pypi.org/project/molcompose-mcp/"><img alt="molcompose-mcp on PyPI" src="https://img.shields.io/pypi/v/molcompose-mcp?color=12A08C&label=molcompose-mcp&logo=pypi&logoColor=white"></a>
   <a href="https://pypi.org/project/molcompose-mcp/"><img alt="Supported Python versions" src="https://img.shields.io/pypi/pyversions/molcompose-mcp?color=4477AA&logo=python&logoColor=white"></a>
   <a href="https://pepy.tech/projects/molcompose-mcp"><img alt="PyPI downloads reported by Pepy" src="https://api.pepy.tech/badge/molcompose-mcp"></a>
-  <a href="https://doi.org/10.5281/zenodo.22047284"><img alt="Example dataset DOI" src="https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22047284-1682D4?logo=zenodo&logoColor=white"></a>
+  <a href="https://doi.org/10.5281/zenodo.22047283"><img alt="Zenodo archive DOI (all versions)" src="https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22047283-1682D4?logo=zenodo&logoColor=white"></a>
   <a href="https://github.com/ChiaChunL/MolCompose/actions/workflows/unit-tests.yml"><img alt="CI" src="https://github.com/ChiaChunL/MolCompose/actions/workflows/unit-tests.yml/badge.svg"></a>
   <a href="https://docs.astral.sh/ruff/"><img alt="Ruff" src="https://img.shields.io/badge/lint-Ruff-D7A00A?logo=ruff&logoColor=white"></a>
   <a href="https://github.com/ChiaChunL/MolCompose/blob/main/LICENSE"><img alt="BSD-3-Clause" src="https://img.shields.io/badge/licence-BSD--3--Clause-7B7BD8"></a>
@@ -196,7 +196,7 @@ shown on an AF3 model; imported values use their corresponding structures.
 ## 🧪 Data and license
 
 [Examples](examples/README.md) include barnase–barstar structures and analysis
-inputs. Archived data are available at [Zenodo](https://doi.org/10.5281/zenodo.22047284).
+inputs. Archived data are available at [Zenodo (all versions)](https://doi.org/10.5281/zenodo.22047283).
 MolCompose is distributed under the [BSD-3-Clause license](LICENSE).
 
 <a id="citation"></a>
