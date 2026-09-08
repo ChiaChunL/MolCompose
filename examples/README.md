@@ -9,7 +9,7 @@ saturation scans, the MD trajectories' derived results — is archived on Zenodo
 rather than kept here. It is data, it does not change when the code does, and
 most of it is far larger than a repository should carry.
 
-> **Full example dataset:** <https://doi.org/10.5281/zenodo.22047284>
+> **Full example dataset (all versions):** <https://doi.org/10.5281/zenodo.22047283>
 
 ## Quick start
 
@@ -97,4 +97,4 @@ the MD start and end frames, and the repair reports. Its own README documents
 how each was produced — engine versions, seeds, force field and MD protocol,
 and the `gmx_MMPBSA` settings.
 
-> <https://doi.org/10.5281/zenodo.22047284>
+> <https://doi.org/10.5281/zenodo.22047283>
