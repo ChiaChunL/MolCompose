@@ -68,6 +68,38 @@ def test_the_installed_version_and_the_reported_version_are_the_same():
     )
 
 
+def test_the_mcp_declared_and_reported_versions_are_the_same():
+    """PyPI metadata and the server's runtime handshake must agree."""
+    import re
+
+    declared = tomllib.loads((ROOT / "mcp" / "pyproject.toml").read_text())[
+        "project"
+    ]["version"]
+    source = (ROOT / "mcp" / "molcompose_mcp" / "__init__.py").read_text()
+    reported = re.search(r'^__version__ = "([^"]+)"', source, re.M)
+    assert reported is not None, "mcp/molcompose_mcp/__init__.py must declare __version__"
+    assert reported.group(1) == declared, (
+        f"mcp/pyproject says {declared}, the server reports {reported.group(1)}"
+    )
+
+
+def test_current_bundle_and_mcp_versions_are_a_supported_pair():
+    """Independent package versions must still pass the runtime handshake."""
+    from molcompose_mcp.assistant import compatibility_status
+
+    bundle = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"][
+        "version"
+    ]
+    mcp = tomllib.loads((ROOT / "mcp" / "pyproject.toml").read_text())[
+        "project"
+    ]["version"]
+
+    status = compatibility_status(mcp, bundle)
+    assert status["server_version"] == mcp
+    assert status["bundle_version"] == bundle
+    assert status["compatible"] is True, status["warning"]
+
+
 def test_the_tab_icons_are_declared_as_package_data():
     """Non-code files ship only if declared, and these are not code.
 

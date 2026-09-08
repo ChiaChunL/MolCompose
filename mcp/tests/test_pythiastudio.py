@@ -10,11 +10,12 @@ from molcompose_mcp.pythiastudio import (
 )
 
 
-def test_api_key_prefers_explicit_then_environment(monkeypatch):
+def test_api_key_prefers_environment_and_keeps_explicit_as_legacy_fallback(monkeypatch):
     monkeypatch.delenv("PYTHIASTUDIO_API_KEY", raising=False)
     assert api_key("explicit") == "explicit"
     monkeypatch.setenv("PYTHIASTUDIO_API_KEY", "from-env")
     assert api_key() == "from-env"
+    assert api_key("legacy-explicit") == "from-env"
 
 
 def test_missing_api_key_explains_how_to_set_one(monkeypatch):

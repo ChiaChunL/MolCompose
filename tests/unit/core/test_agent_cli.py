@@ -65,7 +65,10 @@ def test_mcp_config_points_the_agent_at_this_session():
     config = mcp_config("/opt/bin/molcompose-mcp", "http://127.0.0.1:3100")
     server = config["mcpServers"][SERVER_NAME]
     assert server["command"] == "/opt/bin/molcompose-mcp"
-    assert server["args"] == ["--chimerax-url", "http://127.0.0.1:3100"]
+    assert server["args"] == [
+        "--chimerax-url", "http://127.0.0.1:3100",
+        "--profile", "assistant",
+    ]
 
 
 def test_write_mcp_config_round_trips(tmp_path):
@@ -89,6 +92,8 @@ def test_claude_takes_the_prompt_on_stdin_not_as_an_argument():
     # Headless mode cannot prompt for tool permission, and the allow-list is
     # scoped to this server so the agent gets no other tools.
     assert argv[argv.index("--allowedTools") + 1] == ALLOWED_TOOL_PREFIX
+    assert argv[argv.index("--tools") + 1] == ""
+    assert "--strict-mcp-config" in argv
     assert ALLOWED_TOOL_PREFIX == "mcp__molcompose"
 
 
@@ -155,7 +160,8 @@ def test_command_for_codex_binds_this_server_and_live_url_inline():
         in argv
     )
     assert (
-        'mcp_servers.molcompose.args=["--chimerax-url","http://127.0.0.1:3100"]'
+        'mcp_servers.molcompose.args=["--chimerax-url","http://127.0.0.1:3100",'
+        '"--profile","assistant"]'
         in argv
     )
 
@@ -181,6 +187,58 @@ def test_codex_turn_is_bound_to_the_live_chimerax_session():
     assert effective_prompt.endswith(
         "Characterise the interface and report the returned numbers."
     )
+
+
+def test_live_contract_uses_server_display_values_without_discarding_raw_precision():
+    argv = build_command(
+        get_agent("codex"),
+        "Report the interface.",
+        server_executable="/opt/bin/molcompose-mcp",
+    )
+    effective_prompt = argv[-1]
+
+    assert "Use the returned `display` values in prose" in effective_prompt
+    assert "preserve `raw` values" in effective_prompt
+    assert "measured values exactly as" not in effective_prompt
+
+
+def test_live_contract_keeps_default_interface_semantics_explicit():
+    argv = build_command(
+        get_agent("codex"),
+        "Report the interface.",
+        server_executable="/opt/bin/molcompose-mcp",
+    )
+    effective_prompt = argv[-1]
+
+    assert "default heavy criterion and 4.5 Å cutoff" in effective_prompt
+    assert "contacting residue pairs" in effective_prompt
+    assert "Read and report the returned `skipped`" in effective_prompt
+    assert "label it as an estimate" in effective_prompt
+
+
+def test_live_contract_starts_with_the_assistant_session_handshake():
+    argv = build_command(
+        get_agent("codex"),
+        "Report the interface.",
+        server_executable="/opt/bin/molcompose-mcp",
+    )
+
+    assert "call inspect_session first" in argv[-1]
+    assert "compatibility" in argv[-1]
+
+
+def test_live_contract_does_not_let_codex_skip_figure_review():
+    argv = build_command(
+        get_agent("codex"),
+        "Make and export a figure.",
+        server_executable="/opt/bin/molcompose-mcp",
+    )
+    prompt = argv[-1]
+
+    assert prompt.index("render_preview") < prompt.index("export_artifact")
+    assert "cropped" in prompt
+    assert "colour key" in prompt
+    assert "cannot visually verify" in prompt
 
 
 def test_claude_prompt_is_not_changed_by_the_codex_live_session_contract():
@@ -330,6 +388,7 @@ def test_the_config_says_which_client_will_be_issuing():
     named = mcp_config("molcompose-mcp", "http://127.0.0.1:3010", "agent:codex")
     args = named["mcpServers"]["molcompose"]["args"]
     assert args[-2:] == ["--source", "agent:codex"]
+    assert args[2:4] == ["--profile", "assistant"]
     assert "http://127.0.0.1:3010" in args
 
 
@@ -356,3 +415,4 @@ def test_the_cli_that_ignores_the_config_file_is_told_as_well():
     inline = " ".join(argv)
     assert '"--source","agent:codex"' in inline
     assert '"--chimerax-url","http://127.0.0.1:3010"' in inline
+    assert '"--profile","assistant"' in inline

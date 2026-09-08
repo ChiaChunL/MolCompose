@@ -97,9 +97,10 @@ def disclosure_text(data: ReportData) -> str:
         )
     base = (
         f"This analysis was produced with MolCompose v{version} in UCSF ChimeraX "
-        f"{chimerax}. The complete command recipe ({count} "
+        f"{chimerax}. The canonical ChimeraX session recipe ({count} "
         f"command{'' if count == 1 else 's'}) is included in this record and "
-        "reproduces every value reported here."
+        "reproduces every value reported here. It spans the live ChimeraX "
+        "session and is not limited to the current MCP connection."
     )
     if any(is_agent(source) for source in sources):
         return base + (

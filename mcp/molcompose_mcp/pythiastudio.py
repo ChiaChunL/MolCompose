@@ -6,8 +6,9 @@ file that `molcompose ddg` can then load — so the agent, not the bundle,
 becomes the integration layer, and the bundle keeps its zero-service
 dependency profile.
 
-API keys are supplied by the user (environment variable `PYTHIASTUDIO_API_KEY`
-or an explicit argument) and are never logged.
+API keys are supplied by the user. The `PYTHIASTUDIO_API_KEY` environment
+variable takes precedence; the explicit argument is a deprecated compatibility
+fallback and is never logged.
 """
 
 import csv
@@ -29,7 +30,7 @@ class PythiaStudioError(RuntimeError):
 
 
 def api_key(explicit: str | None = None) -> str:
-    key = explicit or os.environ.get("PYTHIASTUDIO_API_KEY", "")
+    key = os.environ.get("PYTHIASTUDIO_API_KEY", "") or explicit
     if not key:
         raise PythiaStudioError(
             "no PythiaStudio API key: set PYTHIASTUDIO_API_KEY or pass one "

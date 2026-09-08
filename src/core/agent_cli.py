@@ -30,14 +30,30 @@ LIVE_CHIMERAX_CONTRACT = (
     "You are operating the currently open ChimeraX session through the "
     "molcompose MCP server. Treat that live session as the sole source of truth "
     "for the structure in this window.\n\n"
-    "Before answering any question about an open structure, call list_models. "
+    "Before answering any question about an open structure, call "
+    "inspect_session first and respect its compatibility result. It includes "
+    "the current list_models view and the assistant contract version. "
+    "The assistant profile has no MCP resources: do not call "
+    "list_mcp_resources or read_mcp_resource for routine structure questions. "
+    "Use inspect_session and analyse_interface directly. "
     "Use molcompose MCP tools for structure discovery, analysis, measurements, "
     "and visual changes in this session. Do not search the filesystem, inspect "
     "saved reports or session files, or run a shell command or another ChimeraX "
     "process. Do not fetch structures or other data from the network unless the "
     "user explicitly asks you to. If the required model is not open or an MCP "
-    "call fails, say so instead of substituting stale or external data. Report "
-    "measured values exactly as the MolCompose tools return them.\n\n"
+    "call fails, say so instead of substituting stale or external data. Use "
+    "the returned `display` values in prose, and preserve `raw` values when "
+    "the user asks for exact data or reproducibility details.\n\n"
+    "Unless the user asks for another interface definition, keep the default "
+    "heavy criterion and 4.5 Å cutoff. When reporting `contact_pairs`, call "
+    "them contacting residue pairs, never atom pairs. Read and report the "
+    "returned `skipped` reasons in an analysis answer. If you report affinity, "
+    "ΔG or Kd, label it as an estimate rather than an experimental value.\n\n"
+    "For a figure request, use only a tested `compose_figure` goal, then call "
+    "`render_preview` before `export_artifact`. Inspect whether the subject is "
+    "cropped, labels overlap, or a colour key is unreadable. If the preview "
+    "is unavailable or ambiguous, state that you cannot visually verify the "
+    "figure instead of claiming it passed review.\n\n"
     "User request:\n"
 )
 
@@ -80,11 +96,14 @@ AGENTS = (
         label="Claude Code",
         executable="claude",
         # --print is non-interactive, so tool permissions cannot be granted by
-        # prompting: the MolCompose tools must be allowed up front. Restricting
-        # the allow-list to this server means the agent gets our validated tool
-        # surface and nothing else.
+        # prompting: the MolCompose tools must be allowed up front. Hide the
+        # built-in tools and ignore user-level MCP servers so this subprocess
+        # sees only the validated surface configured for the live session.
         arguments=(
             "--print",
+            "--tools",
+            "",
+            "--strict-mcp-config",
             "--allowedTools",
             ALLOWED_TOOL_PREFIX,
             "--mcp-config",
@@ -212,7 +231,10 @@ def mcp_config(server_executable: str, chimerax_url: str = DEFAULT_CHIMERAX_URL,
     is, so it says. Without it every client records as "agent" and a session
     that used two of them cannot be told apart afterwards.
     """
-    args = ["--chimerax-url", chimerax_url]
+    args = [
+        "--chimerax-url", chimerax_url,
+        "--profile", "assistant",
+    ]
     if source:
         args += ["--source", source]
     return {"mcpServers": {SERVER_NAME: {"command": server_executable, "args": args}}}
@@ -273,7 +295,10 @@ def _inline_mcp_arguments(server_executable: str, chimerax_url: str,
     than neither doing it: the record would look complete and be wrong.
     """
     command = json.dumps(server_executable)
-    arguments = ["--chimerax-url", chimerax_url]
+    arguments = [
+        "--chimerax-url", chimerax_url,
+        "--profile", "assistant",
+    ]
     if source:
         arguments += ["--source", source]
     args = json.dumps(arguments, separators=(",", ":"))
