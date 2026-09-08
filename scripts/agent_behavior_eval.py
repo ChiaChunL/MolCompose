@@ -19,6 +19,7 @@ import zlib
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from math import isqrt
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
@@ -532,35 +533,40 @@ def _preview_png(width: int, height: int, *, cropped: bool = False) -> bytes:
     hotspots = [] if cropped else [
         (width // 2, height * fraction // 10) for fraction in (3, 4, 5, 6, 7)
     ]
+    background = b"\x00" + bytes((246, 247, 250)) * width
+    radius_x_squared = radius_x**2
+    radius_y_squared = radius_y**2
+    hotspot_radius_squared = hotspot_radius**2
+
+    def paint(row, start, end, colour):
+        start, end = max(0, start), min(width, end)
+        if start < end:
+            row[1 + start * 3:1 + end * 3] = colour * (end - start)
+
     raw = bytearray()
     for y in range(height):
-        raw.append(0)
-        for x in range(width):
-            left = (
-                (x - left_x) ** 2 * radius_y**2
-                + (y - center_y) ** 2 * radius_x**2
-                <= radius_x**2 * radius_y**2
+        row = bytearray(background)
+        vertical = radius_y_squared - (y - center_y) ** 2
+        if vertical >= 0:
+            # Solve the integer ellipse inequality once per row; isqrt keeps
+            # boundary pixels exact without per-pixel Python calculations.
+            extent = isqrt(radius_x_squared * vertical // radius_y_squared)
+            left_start, left_end = left_x - extent, left_x + extent + 1
+            right_start, right_end = right_x - extent, right_x + extent + 1
+            paint(row, left_start, left_end, bytes((66, 133, 244)))
+            paint(row, right_start, right_end, bytes((255, 167, 38)))
+            paint(
+                row,
+                max(left_start, right_start),
+                min(left_end, right_end),
+                bytes((126, 87, 194)),
             )
-            right = (
-                (x - right_x) ** 2 * radius_y**2
-                + (y - center_y) ** 2 * radius_x**2
-                <= radius_x**2 * radius_y**2
-            )
-            hotspot = any(
-                (x - hx) ** 2 + (y - hy) ** 2 <= hotspot_radius**2
-                for hx, hy in hotspots
-            )
-            if hotspot:
-                colour = (211, 47, 47)
-            elif left and right:
-                colour = (126, 87, 194)
-            elif left:
-                colour = (66, 133, 244)
-            elif right:
-                colour = (255, 167, 38)
-            else:
-                colour = (246, 247, 250)
-            raw.extend(colour)
+        for hx, hy in hotspots:
+            remaining = hotspot_radius_squared - (y - hy) ** 2
+            if remaining >= 0:
+                extent = isqrt(remaining)
+                paint(row, hx - extent, hx + extent + 1, bytes((211, 47, 47)))
+        raw.extend(row)
     header = struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0)
     return (
         b"\x89PNG\r\n\x1a\n"

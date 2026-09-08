@@ -39,6 +39,10 @@ class _Host:
                 value = {"steps": {"interface": True}}
             elif "model #5" in command:
                 value = {"buried_area": "976.8443517193655"}
+            elif "model #6" in command:
+                value = {"buried_area": "private-host-payload"}
+            elif "model #7" in command:
+                value = {"skipped": {"api_key=private-host-payload": 123}}
             else:
                 value = json.loads((Path(__file__).parent / "fixtures" /
                                     "characterise-1brs-python-values.json").read_text())
@@ -61,7 +65,11 @@ def _call(tmp_path, name, arguments):
         params = StdioServerParameters(
             command=sys.executable,
             args=[str(Path(__file__).resolve()), str(tmp_path / "report.json")],
-            env={"PYTHONDONTWRITEBYTECODE": "1"},
+            env={
+                "PYTHONDONTWRITEBYTECODE": "1",
+                # Keep subprocess calls on the same checkout as these tests.
+                "PYTHONPATH": str(Path(__file__).resolve().parents[1]),
+            },
         )
         async with stdio_client(params) as (read, write):
             async with ClientSession(read, write) as session:
@@ -141,6 +149,19 @@ def test_stdio_invalid_numeric_string_is_a_tool_error_not_client_failure(tmp_pat
     })
     assert result.is_error
     assert "buried_area" in str(result.content)
+
+
+@pytest.mark.parametrize(("model", "field"), [
+    ("#6", "buried_area"),
+    ("#7", "skipped"),
+])
+def test_stdio_invalid_output_reports_field_without_echoing_payload(tmp_path, model, field):
+    result = _call(tmp_path, "characterise_interface", {
+        "group_a": ["A"], "group_b": ["B"], "model": model, "style": False,
+    })
+    assert result.is_error
+    assert field in str(result.content)
+    assert "private-host-payload" not in str(result.content)
 
 
 def test_stdio_assistant_retains_internal_dictionary(tmp_path):
