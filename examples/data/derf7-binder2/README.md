@@ -1,38 +1,34 @@
 # Der f 7–binder2 case
 
-Der f 7–binder2 is the designed-binder case reported in the MolCompose
-Application Note. `DerF7_b2.pdb` is the BindCraft authors' deposited model
-from https://doi.org/10.5281/zenodo.14249738, used here as an external input.
-The structural comparison uses PDB 9HAE.
+Der f 7–binder2 is the designed-binder case analysed in the MolCompose
+application note. `DerF7_b2.pdb` is the BindCraft design deposited by its
+authors at https://doi.org/10.5281/zenodo.14249738; the experimental reference
+is PDB 9HAE. Chain A is Der f 7 and chain B is binder2 throughout.
 
 > **Archived copy (all versions):** <https://doi.org/10.5281/zenodo.22047283>,
-> file `molcompose-case-derf7-binder2-0.1.3.tar.gz`. The same files are in the
+> file `molcompose-case-derf7-binder2-0.1.3.tar.gz`. The same data are in the
 > MolCompose repository under `examples/data/derf7-binder2/`.
 
-- `inputs/` — design PDB, sequences, 9HAE CIF, selected AF3 model and matching
-  confidence/summary JSONs.
-- `prediction/af3-template-free/` — native AF3 inputs, all 15 candidate sets,
-  native ranking and corrected derived summary. Selection used the maximum
-  native ranking score: seed 2066, sample 2, score 0.8560384195236908.
-- `md/` — run1 configuration and original analysis outputs, using 20–100 ns
-  of a 100-ns trajectory. No across-run averages are included.
-- `source_data/` — the full Pythia-PPI scan and numeric source tables,
-  including the 42-residue table with maximum ΔΔG and the corresponding mutant.
-- `derived/` — numerical MolCompose results checked against these inputs.
-- `recipes/` — portable MolCompose analysis and molecular-rendering commands.
-- `DerF7_b2.csv`, `pythia_ppi_results.xlsx` — original Pythia-PPI export files.
+- `inputs/` — design PDB, sequences, 9HAE, and the selected AF3 model with its
+  confidence and summary files.
+- `prediction/af3-template-free/` — the AF3 input and all 15 candidate models
+  with their native ranking. The selected model is seed 2066, sample 2.
+- `md/` — MD parameter files, and the RMSF and gmx_MMPBSA outputs of run 1.
+- `source_data/` — the full Pythia-PPI scan and the tables behind Table S1 and
+  Figure S1.
+- `derived/` — MolCompose results computed from these inputs.
+- `recipes/` — scripts that replay the analysis and render the structure panels.
 
-The selected AF3 CIF and native confidence files are unchanged. The derived
-summary reports pDockQ2 = 0.7399037639795328. Design and AF3 DockQ values
-against 9HAE are 0.9014969620 and 0.9212407050. The design interface has
-53 contact pairs and 42 residues. Run1 mean interface Cα RMSF is 1.134238 Å;
-the MM/GBSA and MM/PBSA total estimates are −82.87 and −76.22 kcal/mol.
-See the source-data and MD READMEs for units, mappings and definitions.
+Against 9HAE, the design and the AF3 model reach DockQ 0.901 and 0.921. The
+design interface has 53 contact pairs between 42 residues; their mean Cα RMSF
+in run 1 is 1.13 Å. The MM/GBSA and MM/PBSA totals are −82.87 and
+−76.22 kcal/mol. Units, residue mappings and definitions are in the
+`source_data/` and `md/` READMEs.
 
 ## Quick start
 
-With MolCompose installed, use a **new, empty ChimeraX session**. From the
-root of a clone of the MolCompose repository:
+With ChimeraX 1.12 and MolCompose 0.1.3, open a **new, empty ChimeraX session**.
+From the root of the MolCompose repository:
 
 ```text
 open examples/data/derf7-binder2/recipes/reproduce_analysis.py
@@ -44,34 +40,26 @@ From the unpacked Zenodo archive, use its directory instead:
 open /path/to/case-derf7-binder2/recipes/reproduce_analysis.py
 ```
 
-Reports go into a new `outputs/analysis-*` directory. This imports existing
-results; it does not rerun MD or AF3. The analysis was tested with ChimeraX
-1.12 and MolCompose 0.1.3 source.
+Reports go into a new `outputs/analysis-*` directory. The script imports the
+saved prediction and MD results rather than rerunning AF3 or MD.
 
-To render individual molecular panels in a new graphical session:
+To render the molecular panels of Figure 1, use a new graphical session:
 
 ```text
 open examples/data/derf7-binder2/recipes/render_structure_panels.py
 ```
 
-The templates use run1 for RMSF/PB decomposition and compare only with 9HAE.
-They reset the disposable session and write to a unique output directory.
-The portable wrapper was statically checked in this refresh, not rerun
-graphically. Final manual Figure 1 composition is outside its scope.
-No Figure S1 image or plotting script is included.
+The panels use run 1 for RMSF and MM/PBSA and 9HAE as the reference. The script
+resets the session between panels and writes to a new output directory.
 
-To run the analyses one command at a time, see the step-by-step commands in
-the repository's `examples/README.md`.
+For the analyses one command at a time, see `examples/README.md`.
 
 ## Scope and terms
 
-This package contains configurations and analysis outputs, not the raw MD
-trajectory, full topology/checkpoint set, prediction databases or AF3 weights.
-It supports inspection, reimport and presentation of the reported results,
-not a self-contained rerun of all simulations and predictions.
+MD trajectories, full topologies and AF3 model weights are not included.
 
-AF3 outputs and substantially derived metrics/views retain the original
-`AF3_OUTPUT_TERMS_OF_USE.md`; see `AF3_LEGALLY_BINDING_TERMS.txt` and `NOTICE.md`.
-`LICENSE-CODE.txt` applies to MolCompose code, not to all third-party data.
-Original native files and terms are unchanged. `manifest.tsv` and
-`SHA256SUMS.txt` provide file-level integrity checks.
+AF3 outputs, and metrics and views derived from them, are subject to the
+AlphaFold 3 output terms in `AF3_OUTPUT_TERMS_OF_USE.md` and
+`AF3_LEGALLY_BINDING_TERMS.txt`; see `NOTICE.md`. `LICENSE-CODE.txt`
+(BSD-3-Clause) covers the MolCompose scripts. `SHA256SUMS.txt` and
+`manifest.tsv` give a checksum for every file.

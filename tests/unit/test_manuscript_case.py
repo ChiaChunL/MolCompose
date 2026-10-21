@@ -19,7 +19,7 @@ def test_case_checksum_inventory_is_complete_and_consistent():
         assert hashlib.sha256(path.read_bytes()).hexdigest() == expected, relative
         entries[relative] = expected
 
-    assert len(entries) == 104
+    assert len(entries) == 102
     actual = {
         path.relative_to(CASE).as_posix()
         for path in CASE.rglob("*")

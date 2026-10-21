@@ -114,11 +114,12 @@ The case analysed in the application note: the BindCraft authors' deposited
 design `DerF7_b2.pdb`, compared with the crystal structure PDB
 [9HAE](https://www.rcsb.org/structure/9HAE) and with a local, template-free
 AlphaFold 3 prediction. Chain A is Der f 7 and chain B is binder2 in every
-file. The directory is the unpacked `molcompose-case-derf7-binder2-0.1.3.tar.gz`
-from Zenodo; its README gives repository paths, and the integrity manifests
-are updated accordingly. The data and scripts are unchanged. Its
-[README](data/derf7-binder2/README.md) covers each file, the AF3 model
-selection and the MD protocol.
+file. The directory holds the data and scripts of
+`molcompose-case-derf7-binder2-0.1.3.tar.gz` from Zenodo, with its READMEs
+written for the repository and without the two spreadsheet exports of the
+Pythia-PPI scan, which `source_data/pythia_ppi_all_mutations.csv` already
+holds. Its [README](data/derf7-binder2/README.md) covers each file, the AF3
+model selection and the MD protocol.
 
 ### Replay the MolCompose analysis
 
