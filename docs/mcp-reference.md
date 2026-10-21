@@ -1,11 +1,11 @@
 # MolCompose MCP reference
 
-For installation, configuration and the seven-tool assistant workflow, see the
+For installation, configuration and the assistant workflow, see the
 [MCP README](../mcp/README.md).
 
 ## Profiles and expert tools
 
-The `assistant` profile embeds routine guidance in its seven tools. The `expert`
+The `assistant` profile embeds routine guidance in its tools. The `expert`
 and default `all` profiles also expose the `molcompose://skill` resource for
 low-level workflows; its source is [SKILL.md](../skill/SKILL.md).
 
@@ -28,43 +28,20 @@ an agent workflow rule, not a server-side export lock.
 
 ## Results and precision
 
-Analysis results retain machine values in their existing fields and under `raw`.
-Use `display` for formatted summaries and `raw` for downstream computation.
-The `skipped` block explains unavailable analyses. Different metrics retain
-their own definitions and scales; they are not combined into a universal score.
-
-`inspect_session` reports bundle/server compatibility. An unknown version or
-compatibility warning requires investigation, not an assumption of compatibility.
+Use `raw` for computation, `display` for formatted summaries, and `skipped` for
+unavailable analyses.
 
 ## Side effects and confirmation
 
-Tool annotations distinguish session changes, local file writes and external
-requests. They do not replace application-level checks.
-
-- `export_artifact` asks before replacing an image or requested sidecar, including
-  symbolic links. Its file QA checks existence and non-empty content, not visual
-  quality or scientific validity.
-- Expert `export_figure` refuses existing targets with `overwrite=false`.
-  A new provenance sidecar is created exclusively. Multi-file export is not
-  atomic: a late failure can leave an already written image.
-- `load_external_evidence(kind="pythiastudio", ...)` separately confirms structure
-  upload and any overwrite of the local output. The expert
-  `predict_ddg_pythiastudio` is an explicit upload operation. Configure the key
-  with `PYTHIASTUDIO_API_KEY`; its explicit key argument is a deprecated fallback.
-- Local ΔΔG, energy and RMSF imports are not uploaded. Opening a PDB identifier
-  can fetch a structure from the network.
+Assistant tools request confirmation before overwriting files or uploading
+structures to PythiaStudio. Local data imports do not upload files. Expert tools
+use explicit overwrite and upload operations. Opening a PDB identifier fetches
+the structure from the network if needed.
 
 ## Provenance scopes
 
-With recipe saving enabled, figure export writes a canonical ChimeraX `.cxc`
-sidecar and marks the provenance `recipe_scope: "session"`. This recipe can
-include earlier panel, command-line and MCP operations.
-
-`get_recipe` instead returns commands observed by the current MCP process.
-Without a canonical recipe, provenance is process-scoped and is not a complete
-session record. Repeated command text cannot identify a particular occurrence:
-uncertain canonical sources remain `unknown` and timestamps remain missing.
-The separate process history preserves its observations.
+With recipe saving enabled, figure export includes a ChimeraX session recipe
+(`.cxc`). `get_recipe` returns only commands recorded by the current MCP process.
 
 ## Native command restrictions
 

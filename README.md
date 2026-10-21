@@ -44,10 +44,9 @@ Log. Metrics that cannot be calculated or mapped remain unavailable.
 
 ## 📦 Installation
 
+These instructions cover bundle **0.1.3** and MCP **0.1.2**.
 Tested on macOS with ChimeraX 1.12. The separate MCP process requires Python
 3.11 or later.
-
-### Released packages
 
 In ChimeraX, install through **Tools → More Tools…** or run:
 
@@ -61,20 +60,6 @@ For agent access, install the separate bridge in a terminal:
 ```bash
 python -m pip install --upgrade molcompose-mcp
 ```
-
-### This checkout
-
-This README describes bundle **0.1.3** and MCP **0.1.2**.
-Registry badges show the latest published versions. To use this checkout,
-run `devel install /path/to/MolCompose exit false` in ChimeraX, wait for
-installation to finish, then restart ChimeraX. From the repository root, run:
-
-```bash
-python -m pip install ./mcp
-```
-
-Alternatively, install the matching wheel with
-`toolshed install /path/to/chimerax_molcompose-0.1.3-py3-none-any.whl` in ChimeraX.
 
 <a id="quick-start"></a>
 
@@ -106,7 +91,7 @@ parameters, presets and export formats.
 2. Open **Agent** and select an installed, signed-in Codex or Claude Code CLI.
    If it is not detected, choose its absolute path under **Setup**.
 3. Ask a question. The first send starts the local bridge when needed and uses
-   the seven-tool `assistant` profile.
+   the `assistant` profile.
 
 Follow-up questions share the active conversation. **New conversation** starts
 fresh. Custom CLI commands may be one-shot.
@@ -202,11 +187,11 @@ shown on an AF3 model; imported values use their corresponding structures.
   MD analysis parameters and results, numerical source tables, and replay scripts.
   See the [reproduction instructions](examples/README.md#manuscript-case).
 
-The manuscript case data and scripts match the published 0.1.3 case archive;
-the README and integrity manifests are adapted for this repository.
-The scripts replay analysis of stored inputs and results, not AF3 or MD runs.
-The case and the full three-complex example dataset are also archived at
-[Zenodo (all versions)](https://doi.org/10.5281/zenodo.22047283).
+Manuscript case data, replay scripts, and the full example dataset are available
+on [Zenodo](https://doi.org/10.5281/zenodo.22047283). The scripts reproduce
+MolCompose analyses from stored inputs and results; they do not rerun AF3 or MD
+simulations.
+
 MolCompose code is distributed under the [BSD-3-Clause license](LICENSE).
 Third-party case data retain their original terms; see the case
 [NOTICE](examples/data/derf7-binder2/NOTICE.md) and

@@ -37,8 +37,17 @@ def test_mcp_readme_matches_the_registered_safety_and_assistant_contract():
     assert ASSISTANT_TOOLS <= set(re.findall(r"`([a-z_]+)`", text))
     assert "## Assistant workflow" in text
     assert "## Troubleshooting" in text
-    for term in ("`raw`", "`display`", 'recipe_scope: "session"', "process", "unknown"):
+    for term in ("`raw`", "`display`", "`skipped`"):
         assert term in reference
+    provenance = reference.split("## Provenance scopes\n", 1)[1].split("\n## ", 1)[0]
+    provenance = " ".join(provenance.split())
+    assert "ChimeraX session recipe" in provenance and "`.cxc`" in provenance
+    assert "`get_recipe` returns only commands recorded by the current MCP process" in provenance
+    safety = " ".join(reference.split())
+    assert "confirmation before overwriting files or uploading structures" in safety
+    assert "Local data imports do not upload files" in safety
+    assert "Expert tools use explicit overwrite and upload operations" in safety
+    assert "unauthenticated" in safety and "`remotecontrol rest stop`" in safety
 
 
 def test_docs_do_not_call_process_local_history_complete_or_scientifically_verified():
@@ -109,8 +118,12 @@ def test_root_readme_decorations_preserve_section_links():
         ("citation", "📄 Citation"),
     ):
         assert f'<a id="{anchor}"></a>\n\n## {heading}' in text
-    for heading in ("This checkout", "External MCP setup prompt", "Verification prompt"):
+    for heading in ("External MCP setup prompt", "Verification prompt"):
         assert f"### {heading}" in text
+    assert "toolshed install ChimeraX_MolCompose" in text
+    assert "python -m pip install --upgrade molcompose-mcp" in text
+    for document in (text, MCP_README.read_text(encoding="utf-8")):
+        assert "#this-checkout" not in document
     assert "A manuscript describing MolCompose has been submitted." in text
 
 

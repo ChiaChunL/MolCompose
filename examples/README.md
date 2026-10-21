@@ -1,6 +1,6 @@
 # MolCompose examples
 
-Two cases live here, each small enough to clone and run in a couple of minutes:
+Two cases are included:
 
 - [`data/1brs/`](data/1brs/) — a worked tour of every import, on the
   barnase–barstar complex (PDB [1BRS](https://www.rcsb.org/structure/1BRS),
@@ -11,8 +11,7 @@ Two cases live here, each small enough to clone and run in a couple of minutes:
 
 The full dataset — three complexes, six prediction engines each, the
 Pythia saturation scans, the MD trajectories' derived results — is archived on
-Zenodo rather than kept here. It is data, it does not change when the code
-does, and most of it is far larger than a repository should carry.
+Zenodo.
 
 > **Full example dataset (all versions):** <https://doi.org/10.5281/zenodo.22047283>
 
@@ -110,80 +109,14 @@ and the `gmx_MMPBSA` settings.
 
 ## The Der f 7–binder2 case
 
-The case analysed in the application note: the BindCraft authors' deposited
-design `DerF7_b2.pdb`, compared with the crystal structure PDB
-[9HAE](https://www.rcsb.org/structure/9HAE) and with a local, template-free
-AlphaFold 3 prediction. Chain A is Der f 7 and chain B is binder2 in every
-file. The directory holds the data and scripts of
-`molcompose-case-derf7-binder2-0.1.3.tar.gz` from Zenodo, with its READMEs
-written for the repository and without the two spreadsheet exports of the
-Pythia-PPI scan, which `source_data/pythia_ppi_all_mutations.csv` already
-holds. Its [README](data/derf7-binder2/README.md) covers each file, the AF3
-model selection and the MD protocol.
+The manuscript case compares the BindCraft design with the experimental
+structure [9HAE](https://www.rcsb.org/structure/9HAE) and a template-free AF3
+prediction. See the [case guide](data/derf7-binder2/README.md) for data sources,
+file mappings, terms, and instructions for running these scripts inside ChimeraX:
 
-### Replay the MolCompose analysis
+- [reproduce_analysis.py](data/derf7-binder2/recipes/reproduce_analysis.py) — replay
+  the analysis using stored inputs and results.
+- [render_structure_panels.py](data/derf7-binder2/recipes/render_structure_panels.py)
+  — render the molecular panels of Figure 1.
 
-Use ChimeraX 1.12 with MolCompose 0.1.3 installed. In a new, empty ChimeraX
-session, from the repository root:
-
-```chimerax
-open examples/data/derf7-binder2/recipes/reproduce_analysis.py
-```
-
-This replays MolCompose analysis on the archived inputs and writes JSON reports
-to a new `outputs/analysis-*` folder inside the case directory. It imports the
-saved prediction and MD results; it does not rerun AlphaFold 3, MD or Pythia-PPI.
-Run the script inside ChimeraX, not with standalone Python.
-
-To render the eight molecular panels, use another new, empty **graphical**
-ChimeraX session, from the repository root:
-
-```text
-open examples/data/derf7-binder2/recipes/render_structure_panels.py
-```
-
-Rendering resets the disposable session between panels and writes to a new
-`outputs/structure-panels-*` folder. It does not assemble the final Figure 1 layout.
-
-To verify all case files, run this in a terminal:
-
-```bash
-cd /path/to/MolCompose/examples/data/derf7-binder2
-shasum -a 256 -c SHA256SUMS.txt
-```
-
-### Or step by step
-
-The same commands, as the recipe issues them. Open the three structures first,
-so the design is `#1`, 9HAE is `#2` and the AF3 model is `#3`.
-
-```chimerax
-open examples/data/derf7-binder2/inputs/DerF7_b2.pdb
-open examples/data/derf7-binder2/inputs/9HAE.cif
-open examples/data/derf7-binder2/inputs/derf7_binder2_template_free_model.cif
-molcompose characterise A B model #1 distance 4.5 criterion heavy style false
-molcompose dockq #2 model #1 chainMap A:A,B:B
-```
-
-Pythia-PPI ΔΔG, MD flexibility and MM/PBSA decomposition all map onto the
-design (`#1`), whose numbering they share:
-
-```chimerax
-molcompose ddg examples/data/derf7-binder2/source_data/pythia_ppi_all_mutations.csv model #1 format pythia-ppi statistic max top 15 interfaceOnly true
-molcompose flexibility examples/data/derf7-binder2/md/results/rmsf-rep1.xvg model #1 chains A,B
-molcompose energy examples/data/derf7-binder2/md/results/decomp-rep1.dat model #1 chains A:A,B:B top 10 solvation pb
-```
-
-For the AF3 model (`#3`), the recipe names its PAE and summary files
-explicitly:
-
-```chimerax
-molcompose characterise A B model #3 distance 4.5 criterion heavy style false paeFile examples/data/derf7-binder2/inputs/derf7_binder2_template_free_confidences.json summaryFile examples/data/derf7-binder2/inputs/derf7_binder2_template_free_summary_confidences.json
-molcompose ipsae examples/data/derf7-binder2/inputs/derf7_binder2_template_free_confidences.json model #3 predictor alphafold3 summaryFile examples/data/derf7-binder2/inputs/derf7_binder2_template_free_summary_confidences.json
-molcompose dockq #2 model #3 chainMap A:A,B:B
-```
-
-The AF3 files carry AlphaFold 3's own output terms, which also cover metrics
-derived from them; see `NOTICE.md` in the case directory.
-
-> **Archived copy (all versions):** <https://doi.org/10.5281/zenodo.22047283>
+File checksums are in [SHA256SUMS.txt](data/derf7-binder2/SHA256SUMS.txt).

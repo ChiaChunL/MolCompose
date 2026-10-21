@@ -94,7 +94,10 @@ class EvalScenario:
 DEFAULT_SCENARIOS = (
     EvalScenario(
         name="explicit-interface",
-        prompt="1BRS 的 A 链和 D 链主要靠什么相互作用结合？请基于当前 ChimeraX 会话回答。",
+        prompt=(
+            "What are the main interactions binding chains A and D of 1BRS? "
+            "Base your answer on the current ChimeraX session."
+        ),
         required_subsequence=("inspect_session", "analyse_interface"),
         max_calls=3,
         required_answer_concepts=_INTERFACE_ANSWER_CONCEPTS,
@@ -103,7 +106,10 @@ DEFAULT_SCENARIOS = (
     ),
     EvalScenario(
         name="implicit-interface",
-        prompt="分析当前打开的这个复合物界面，并解释它主要靠什么结合。",
+        prompt=(
+            "Analyse the interface of the currently open complex and explain "
+            "the main interactions holding it together."
+        ),
         required_subsequence=("inspect_session", "analyse_interface"),
         max_calls=3,
         required_answer_concepts=_INTERFACE_ANSWER_CONCEPTS,
@@ -113,8 +119,9 @@ DEFAULT_SCENARIOS = (
     EvalScenario(
         name="hotspot-figure",
         prompt=(
-            "把当前复合物的界面热点做成图；如果还没分析界面，请先完成必要分析，"
-            "并把 PNG 导出到 agent-eval-hotspot.png。"
+            "Create a figure of the current complex's interface hotspots. "
+            "If the interface has not been analysed, complete the necessary "
+            "analysis first, then export the PNG to agent-eval-hotspot.png."
         ),
         required_subsequence=(
             "inspect_session",
@@ -131,8 +138,9 @@ DEFAULT_SCENARIOS = (
     EvalScenario(
         name="multiturn-hotspot",
         prompt=(
-            "分析当前 1BRS 的 A 链和 D 链界面，说明主要相互作用；"
-            "暂时不要出图。"
+            "Analyse the interface between chains A and D of the current 1BRS "
+            "structure and explain the main interactions. "
+            "Do not create a figure yet."
         ),
         required_subsequence=("inspect_session", "analyse_interface"),
         max_calls=3,
@@ -142,8 +150,9 @@ DEFAULT_SCENARIOS = (
         follow_up=EvalScenario(
             name="multiturn-hotspot-follow-up",
             prompt=(
-                "把刚才那个界面做成热点图，预览确认没有裁切后，"
-                "导出到 agent-eval-follow-up.png。"
+                "Create a hotspot figure of that interface, preview it to "
+                "confirm that nothing is cropped, then export it to "
+                "agent-eval-follow-up.png."
             ),
             required_subsequence=(
                 "compose_figure",
@@ -157,8 +166,9 @@ DEFAULT_SCENARIOS = (
     EvalScenario(
         name="ambiguous-models",
         prompt=(
-            "分析当前打开的复合物界面。若有多个模型，不要替我猜，"
-            "请列出选择并让我确认。"
+            "Analyse the interface of the currently open complex. "
+            "If there are multiple models, do not guess which one I mean; "
+            "list the options and ask me to confirm."
         ),
         required_subsequence=("inspect_session",),
         max_calls=2,
@@ -174,8 +184,9 @@ DEFAULT_SCENARIOS = (
     EvalScenario(
         name="recoverable-failure",
         prompt=(
-            "检查当前 ChimeraX 会话。如果连接或工具暂时失败，请说明如何恢复，"
-            "不要推测结构内容。"
+            "Inspect the current ChimeraX session. If the connection or a tool "
+            "temporarily fails, explain how to recover without speculating "
+            "about the structure."
         ),
         required_subsequence=("inspect_session",),
         max_calls=2,
@@ -205,9 +216,10 @@ DEFAULT_SCENARIOS = (
     EvalScenario(
         name="cropped-preview",
         prompt=(
-            "把当前复合物做成界面概览图并准备导出到 "
-            "agent-eval-cropped.png。导出前必须预览；如果主体明显被裁切，"
-            "请停止并说明问题，不要导出。"
+            "Create an interface overview figure of the current complex and "
+            "prepare to export it to agent-eval-cropped.png. Preview it before "
+            "exporting; if the main subject is clearly cropped, stop and "
+            "explain the problem without exporting."
         ),
         required_subsequence=(
             "inspect_session",
