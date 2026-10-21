@@ -24,7 +24,7 @@ Install the latest published bridge:
 python -m pip install --upgrade molcompose-mcp
 ```
 
-This README describes MCP **0.1.2** with bundle **0.1.3**, not yet published.
+This README describes MCP **0.1.2** with bundle **0.1.3**.
 For this checkout, run `python -m pip install ./mcp` from the repository root
 and install the matching bundle using the
 [checkout instructions](https://github.com/ChiaChunL/MolCompose#this-checkout).

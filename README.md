@@ -38,7 +38,7 @@ Use the graphical panel, ChimeraX commands or an agent connected through
 [`molcompose-mcp`](mcp/README.md). Resolved commands are recorded in the ChimeraX
 Log. Metrics that cannot be calculated or mapped remain unavailable.
 
-[Command reference](docs/command-reference.md) · [Worked examples](examples/README.md) · [MCP setup](mcp/README.md)
+[Command reference](docs/command-reference.md) · [Worked examples](examples/README.md) · [Manuscript case](examples/data/derf7-binder2/README.md) · [MCP setup](mcp/README.md)
 
 <a id="installation"></a>
 
@@ -64,8 +64,8 @@ python -m pip install --upgrade molcompose-mcp
 
 ### This checkout
 
-This README describes bundle **0.1.3** and MCP **0.1.2**, which are not yet
-published. Registry badges show the released versions. To use this checkout,
+This README describes bundle **0.1.3** and MCP **0.1.2**.
+Registry badges show the latest published versions. To use this checkout,
 run `devel install /path/to/MolCompose exit false` in ChimeraX, wait for
 installation to finish, then restart ChimeraX. From the repository root, run:
 
@@ -195,9 +195,22 @@ shown on an AF3 model; imported values use their corresponding structures.
 
 ## 🧪 Data and license
 
-[Examples](examples/README.md) include barnase–barstar structures and analysis
-inputs. Archived data are available at [Zenodo (all versions)](https://doi.org/10.5281/zenodo.22047283).
-MolCompose is distributed under the [BSD-3-Clause license](LICENSE).
+- [1BRS demonstration](examples/README.md#quick-start): barnase–barstar structures
+  and inputs for a compact introduction to MolCompose.
+- [Der f 7–binder2 manuscript case](examples/data/derf7-binder2/README.md): design
+  and 9HAE reference structures, AF3 inputs and predictions, Pythia-PPI results,
+  MD analysis parameters and results, numerical source tables, and replay scripts.
+  See the [reproduction instructions](examples/README.md#manuscript-case).
+
+The manuscript case data and scripts match the published 0.1.3 case archive;
+the README and integrity manifests are adapted for this repository.
+The scripts replay analysis of stored inputs and results, not AF3 or MD runs.
+The case and the full three-complex example dataset are also archived at
+[Zenodo (all versions)](https://doi.org/10.5281/zenodo.22047283).
+MolCompose code is distributed under the [BSD-3-Clause license](LICENSE).
+Third-party case data retain their original terms; see the case
+[NOTICE](examples/data/derf7-binder2/NOTICE.md) and
+[AF3 terms](examples/data/derf7-binder2/AF3_OUTPUT_TERMS_OF_USE.md).
 
 <a id="citation"></a>
 

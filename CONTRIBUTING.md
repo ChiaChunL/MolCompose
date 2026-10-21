@@ -15,7 +15,8 @@ public purpose and be documented here before code lands.
 - `mcp/` is the separately installable `molcompose-mcp` package: an MCP server
   exposing the canonical commands to agents over the ChimeraX REST bridge.
   The bundle never imports it; it is a client of the commands, like the GUI.
-- `examples/` contains compact, self-contained demonstrations.
+- `examples/` contains the compact 1BRS demonstration and the published
+  Der f 7–binder2 manuscript case with data and replay scripts.
 
 Modules named `utils.py`, `helpers.py`, `misc.py`, or similarly vague names
 are prohibited. Generated `build/`, `dist/`, cache, coverage, and

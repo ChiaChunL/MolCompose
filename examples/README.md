@@ -7,7 +7,7 @@ Two cases live here, each small enough to clone and run in a couple of minutes:
   chains A and D), with the files each analysis needs and nothing else.
 - [`data/derf7-binder2/`](data/derf7-binder2/) — the Der f 7–binder2 case
   analysed in the MolCompose application note, as archived on Zenodo. See
-  [its quick start](#the-der-f-7binder2-case) below.
+  [its quick start](#manuscript-case) below.
 
 The full dataset — three complexes, six prediction engines each, the
 Pythia saturation scans, the MD trajectories' derived results — is archived on
@@ -15,6 +15,8 @@ Zenodo rather than kept here. It is data, it does not change when the code
 does, and most of it is far larger than a repository should carry.
 
 > **Full example dataset (all versions):** <https://doi.org/10.5281/zenodo.22047283>
+
+<a id="quick-start"></a>
 
 ## Quick start: 1BRS
 
@@ -104,6 +106,8 @@ and the `gmx_MMPBSA` settings.
 
 > <https://doi.org/10.5281/zenodo.22047283>
 
+<a id="manuscript-case"></a>
+
 ## The Der f 7–binder2 case
 
 The case analysed in the application note: the BindCraft authors' deposited
@@ -111,23 +115,41 @@ design `DerF7_b2.pdb`, compared with the crystal structure PDB
 [9HAE](https://www.rcsb.org/structure/9HAE) and with a local, template-free
 AlphaFold 3 prediction. Chain A is Der f 7 and chain B is binder2 in every
 file. The directory is the unpacked `molcompose-case-derf7-binder2-0.1.3.tar.gz`
-from Zenodo; only its README differs, to give repository paths, and
-`SHA256SUMS.txt` checks every file. Its
+from Zenodo; its README gives repository paths, and the integrity manifests
+are updated accordingly. The data and scripts are unchanged. Its
 [README](data/derf7-binder2/README.md) covers each file, the AF3 model
 selection and the MD protocol.
 
-### Replay everything
+### Replay the MolCompose analysis
 
-In a new, empty ChimeraX session, from the repository root:
+Use ChimeraX 1.12 with MolCompose 0.1.3 installed. In a new, empty ChimeraX
+session, from the repository root:
 
 ```chimerax
 open examples/data/derf7-binder2/recipes/reproduce_analysis.py
 ```
 
-This reruns every reported analysis on the archived inputs and writes JSON
-reports to a new `outputs/analysis-*` folder inside the case directory. It
-imports the saved prediction and MD results; it does not rerun AlphaFold 3
-or MD.
+This replays MolCompose analysis on the archived inputs and writes JSON reports
+to a new `outputs/analysis-*` folder inside the case directory. It imports the
+saved prediction and MD results; it does not rerun AlphaFold 3, MD or Pythia-PPI.
+Run the script inside ChimeraX, not with standalone Python.
+
+To render the eight molecular panels, use another new, empty **graphical**
+ChimeraX session, from the repository root:
+
+```text
+open examples/data/derf7-binder2/recipes/render_structure_panels.py
+```
+
+Rendering resets the disposable session between panels and writes to a new
+`outputs/structure-panels-*` folder. It does not assemble the final Figure 1 layout.
+
+To verify all case files, run this in a terminal:
+
+```bash
+cd /path/to/MolCompose/examples/data/derf7-binder2
+shasum -a 256 -c SHA256SUMS.txt
+```
 
 ### Or step by step
 

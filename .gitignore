@@ -25,3 +25,6 @@ release/
 # Sequence-colouring files are an export format, so any that appear in the
 # tree are output someone produced by hand, not source.
 *.scf
+
+# Case replay writes into unique local directories, not the archived inputs.
+examples/data/derf7-binder2/outputs/
