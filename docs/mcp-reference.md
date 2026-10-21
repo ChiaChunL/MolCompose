@@ -65,7 +65,8 @@ REST bridge is unauthenticated. Stop it with `remotecontrol rest stop` when done
 
 ## Testing
 
-From the repository root, run `pytest -q tests mcp/tests`. The deterministic
+From the repository root, install the checkout with `python -m pip install -e ./mcp`,
+then run `pytest -q tests mcp/tests`. The deterministic
 assistant scenarios in `mcp/tests/test_agent_scenarios.py` use a REST fixture.
 They test tool behavior, not an LLM's performance.
 
