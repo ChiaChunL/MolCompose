@@ -1,0 +1,27 @@
+close session
+windowsize 1200 1000
+open "@CASE@/inputs/DerF7_b2.pdb"
+open "@CASE@/inputs/derf7_binder2_template_free_model.cif"
+open "@CASE@/inputs/9HAE.cif"
+matchmaker #2/A to #1/A
+molcompose interface A B model #2 distance 4.5 criterion heavy
+molcompose style design-reference model #2 references #3 align A partner B
+key #159D91:AF3 "#2F6FB2:9HAE " pos 0.28,0.08 size 0.44,0.025 fontSize 34 colorTreatment distinct ticks false
+graphics silhouettes true width 3 color #4A4A4A
+camera ortho
+view matrix models #1,1,0,0,0,0,1,0,0,0,0,1,0,#2,0.8895,0.27864,-0.36214,5.1457,0.42572,-0.21751,0.87832,6.7975,0.16597,-0.93544,-0.3121,-5.2272,#3,-0.1777,-0.85612,-0.48527,6.6963,0.73871,-0.44184,0.509,-8.6787,-0.65017,-0.26802,0.71094,-6.9994
+view matrix camera 0.59128,0.77573,-0.22054,-7.6839,0.39669,-0.04166,0.91701,95.78,0.70216,-0.62969,-0.33236,-45.003
+clip off
+wait 1
+view #1/B pad 0.12
+hide #1 models
+surface cap false
+clip front -25.2 position #1/B axis y
+clip model #1 false
+clip model #!2 false
+clip model #3 false
+wait 2
+move x 7.46356045116
+wait 2
+molcompose export "@OUTPUT@/D8_AF3_vs_9HAE_right.png" width 3600 height 3000 supersample 3 transparent true overwrite false saveRecipe true
+wait 2

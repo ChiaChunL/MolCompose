@@ -1,0 +1,2396 @@
+{
+  "design_characterise": {
+    "model": "#1",
+    "name": "DerF7_b2.pdb",
+    "steps": [
+      "interface",
+      "interactions",
+      "buried_area",
+      "affinity",
+      "hotspots"
+    ],
+    "skipped": {
+      "confidence": "B-factor/pLDDT values are uniformly zero; this is a placeholder field, not prediction confidence",
+      "interface_scores": "no PAE file found next to DerF7_b2.pdb. Pass one explicitly, or check that the predictor's confidence file was kept alongside the structure \u2014 without it ipSAE, pDockQ2 and LIS cannot be computed."
+    },
+    "interface": {
+      "chains_a": [
+        "A"
+      ],
+      "chains_b": [
+        "B"
+      ],
+      "criterion": "heavy",
+      "cutoff": 4.5,
+      "residues_a": 21,
+      "residues_b": 21,
+      "contact_pairs": 53
+    },
+    "interactions": {
+      "salt-bridge": 1,
+      "hydrophobic": 21,
+      "pi-stacking": 1,
+      "cation-pi": 0,
+      "disulfide": 0
+    },
+    "interaction_detail": [
+      {
+        "kind": "hydrophobic",
+        "a": "VAL A:45",
+        "b": "TRP B:65",
+        "distance": 4.29,
+        "detail": "CG1\u2013CE3"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "ILE A:47",
+        "b": "TYR B:34",
+        "distance": 4.01,
+        "detail": "CG1\u2013CB"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "ILE A:47",
+        "b": "ILE B:37",
+        "distance": 4.12,
+        "detail": "CG2\u2013CD1"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "LEU A:48",
+        "b": "LEU B:22",
+        "distance": 3.96,
+        "detail": "CD1\u2013CD2"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "LEU A:48",
+        "b": "PHE B:26",
+        "distance": 3.66,
+        "detail": "CB\u2013CZ"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "LEU A:48",
+        "b": "TYR B:34",
+        "distance": 3.78,
+        "detail": "CD1\u2013CD2"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "PHE A:50",
+        "b": "LEU B:22",
+        "distance": 3.64,
+        "detail": "CZ\u2013CD2"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "PHE A:50",
+        "b": "PHE B:26",
+        "distance": 3.53,
+        "detail": "CE1\u2013CE2"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "LEU A:105",
+        "b": "VAL B:25",
+        "distance": 3.72,
+        "detail": "CB\u2013CG2"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "LEU A:108",
+        "b": "MET B:24",
+        "distance": 3.95,
+        "detail": "CD1\u2013CE"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "LEU A:108",
+        "b": "VAL B:25",
+        "distance": 4.33,
+        "detail": "CB\u2013CG2"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "ILE A:157",
+        "b": "TYR B:73",
+        "distance": 3.8,
+        "detail": "CG2\u2013CD1"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "LEU A:158",
+        "b": "LEU B:11",
+        "distance": 3.63,
+        "detail": "CD1\u2013CD1"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "LEU A:158",
+        "b": "ILE B:18",
+        "distance": 3.85,
+        "detail": "CB\u2013CD1"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "LEU A:158",
+        "b": "PHE B:66",
+        "distance": 3.83,
+        "detail": "CD2\u2013CE2"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "LEU A:158",
+        "b": "PHE B:70",
+        "distance": 3.87,
+        "detail": "CD1\u2013CD1"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "LEU A:158",
+        "b": "TYR B:73",
+        "distance": 4.03,
+        "detail": "CD1\u2013CD2"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "PRO A:160",
+        "b": "ILE B:18",
+        "distance": 3.66,
+        "detail": "CD\u2013CG2"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "PRO A:160",
+        "b": "LEU B:22",
+        "distance": 4.23,
+        "detail": "CG\u2013CD2"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "PRO A:160",
+        "b": "TYR B:34",
+        "distance": 3.41,
+        "detail": "CG\u2013CE2"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "PHE A:162",
+        "b": "TRP B:65",
+        "distance": 4.26,
+        "detail": "CD2\u2013CZ2"
+      },
+      {
+        "kind": "pi-stacking",
+        "a": "PHE A:50",
+        "b": "PHE B:26",
+        "distance": 4.86,
+        "detail": "T-shaped (86\u00b0)"
+      },
+      {
+        "kind": "salt-bridge",
+        "a": "ASP A:159",
+        "b": "ARG B:21",
+        "distance": 3.88,
+        "detail": "OD2\u2013NE"
+      }
+    ],
+    "buried_area": 976.8443517193655,
+    "affinity": {
+      "delta_g": -6.638485504587159,
+      "kd": 1.351155609866126e-05,
+      "temperature": 25.0
+    },
+    "hotspots": [
+      {
+        "residue": "LEU A:158",
+        "buried_area": 156.0
+      },
+      {
+        "residue": "ARG B:21",
+        "buried_area": 121.7
+      },
+      {
+        "residue": "TRP B:65",
+        "buried_area": 111.5
+      },
+      {
+        "residue": "ILE A:47",
+        "buried_area": 105.6
+      },
+      {
+        "residue": "LEU A:48",
+        "buried_area": 98.0
+      },
+      {
+        "residue": "MET B:24",
+        "buried_area": 84.3
+      },
+      {
+        "residue": "ILE A:157",
+        "buried_area": 81.3
+      },
+      {
+        "residue": "PHE B:26",
+        "buried_area": 72.8
+      },
+      {
+        "residue": "TYR B:34",
+        "buried_area": 72.6
+      },
+      {
+        "residue": "VAL B:25",
+        "buried_area": 72.4
+      }
+    ]
+  },
+  "design_dockq": {
+    "dockq": 0.9014969620144302,
+    "fnat": 0.9206349206349206,
+    "fnonnat": 0.04918032786885246,
+    "irmsd": 0.6740728241527437,
+    "lrmsd": 1.9113299243992095,
+    "native_contacts": 63,
+    "shared_contacts": 58,
+    "interface_residues": 103,
+    "capri_class": "High",
+    "f1": 0.9354838709677418,
+    "clashes": 0
+  },
+  "design_ddg": [
+    [
+      [
+        "B",
+        22
+      ],
+      "L",
+      6.017086982727051,
+      19
+    ],
+    [
+      [
+        "B",
+        70
+      ],
+      "F",
+      5.8169684410095215,
+      19
+    ],
+    [
+      [
+        "B",
+        11
+      ],
+      "L",
+      5.743582248687744,
+      19
+    ],
+    [
+      [
+        "A",
+        159
+      ],
+      "D",
+      5.729299068450928,
+      19
+    ],
+    [
+      [
+        "B",
+        38
+      ],
+      "M",
+      5.166356086730957,
+      19
+    ],
+    [
+      [
+        "A",
+        158
+      ],
+      "L",
+      4.984069347381592,
+      19
+    ],
+    [
+      [
+        "B",
+        18
+      ],
+      "I",
+      4.893616676330566,
+      19
+    ],
+    [
+      [
+        "A",
+        50
+      ],
+      "F",
+      4.724422931671143,
+      19
+    ],
+    [
+      [
+        "A",
+        155
+      ],
+      "L",
+      4.602942943572998,
+      19
+    ],
+    [
+      [
+        "A",
+        48
+      ],
+      "L",
+      4.556149482727051,
+      19
+    ],
+    [
+      [
+        "B",
+        73
+      ],
+      "Y",
+      4.275432586669922,
+      19
+    ],
+    [
+      [
+        "B",
+        34
+      ],
+      "Y",
+      4.037825107574463,
+      19
+    ],
+    [
+      [
+        "A",
+        162
+      ],
+      "F",
+      4.00765323638916,
+      19
+    ],
+    [
+      [
+        "A",
+        103
+      ],
+      "Y",
+      3.8826851844787598,
+      19
+    ],
+    [
+      [
+        "A",
+        45
+      ],
+      "V",
+      3.839570999145508,
+      19
+    ],
+    [
+      [
+        "B",
+        66
+      ],
+      "F",
+      3.7279813289642334,
+      19
+    ],
+    [
+      [
+        "B",
+        31
+      ],
+      "V",
+      3.699253797531128,
+      19
+    ],
+    [
+      [
+        "B",
+        14
+      ],
+      "E",
+      3.5955710411071777,
+      19
+    ],
+    [
+      [
+        "A",
+        161
+      ],
+      "I",
+      3.5431504249572754,
+      19
+    ],
+    [
+      [
+        "B",
+        25
+      ],
+      "V",
+      3.3314692974090576,
+      19
+    ],
+    [
+      [
+        "A",
+        108
+      ],
+      "L",
+      3.3160767555236816,
+      19
+    ],
+    [
+      [
+        "B",
+        26
+      ],
+      "F",
+      3.1839888095855713,
+      19
+    ],
+    [
+      [
+        "B",
+        21
+      ],
+      "R",
+      3.050910234451294,
+      19
+    ],
+    [
+      [
+        "A",
+        160
+      ],
+      "P",
+      2.9360151290893555,
+      19
+    ],
+    [
+      [
+        "B",
+        69
+      ],
+      "N",
+      2.924351215362549,
+      19
+    ],
+    [
+      [
+        "B",
+        30
+      ],
+      "R",
+      2.8986949920654297,
+      19
+    ],
+    [
+      [
+        "B",
+        24
+      ],
+      "M",
+      2.580656051635742,
+      19
+    ],
+    [
+      [
+        "B",
+        33
+      ],
+      "E",
+      2.5399627685546875,
+      19
+    ],
+    [
+      [
+        "B",
+        62
+      ],
+      "G",
+      2.5300886631011963,
+      19
+    ],
+    [
+      [
+        "A",
+        46
+      ],
+      "G",
+      2.346670627593994,
+      19
+    ],
+    [
+      [
+        "B",
+        72
+      ],
+      "R",
+      2.2968153953552246,
+      19
+    ],
+    [
+      [
+        "A",
+        163
+      ],
+      "G",
+      2.1797235012054443,
+      19
+    ],
+    [
+      [
+        "A",
+        156
+      ],
+      "S",
+      2.155745029449463,
+      19
+    ],
+    [
+      [
+        "B",
+        37
+      ],
+      "I",
+      2.120147466659546,
+      19
+    ],
+    [
+      [
+        "A",
+        105
+      ],
+      "L",
+      2.0621414184570312,
+      19
+    ],
+    [
+      [
+        "A",
+        107
+      ],
+      "D",
+      2.0190558433532715,
+      19
+    ],
+    [
+      [
+        "A",
+        106
+      ],
+      "G",
+      1.8752801418304443,
+      19
+    ],
+    [
+      [
+        "B",
+        65
+      ],
+      "W",
+      1.8558862209320068,
+      19
+    ],
+    [
+      [
+        "A",
+        47
+      ],
+      "I",
+      1.8054572343826294,
+      19
+    ],
+    [
+      [
+        "A",
+        154
+      ],
+      "G",
+      1.7857645750045776,
+      19
+    ],
+    [
+      [
+        "A",
+        157
+      ],
+      "I",
+      1.5767695903778076,
+      19
+    ],
+    [
+      [
+        "A",
+        49
+      ],
+      "D",
+      0.6985864639282227,
+      19
+    ]
+  ],
+  "design_rmsf": {
+    "A:1": 2.854,
+    "A:2": 2.105,
+    "A:3": 1.732,
+    "A:4": 1.678,
+    "A:5": 1.403,
+    "A:6": 1.691,
+    "A:7": 1.701,
+    "A:8": 1.329,
+    "A:9": 1.3239999999999998,
+    "A:10": 1.456,
+    "A:11": 1.245,
+    "A:12": 1.011,
+    "A:13": 1.2559999999999998,
+    "A:14": 1.29,
+    "A:15": 1.07,
+    "A:16": 0.983,
+    "A:17": 1.22,
+    "A:18": 1.2349999999999999,
+    "A:19": 1.089,
+    "A:20": 1.154,
+    "A:21": 1.375,
+    "A:22": 1.3650000000000002,
+    "A:23": 1.227,
+    "A:24": 1.394,
+    "A:25": 1.6480000000000001,
+    "A:26": 1.512,
+    "A:27": 1.409,
+    "A:28": 1.416,
+    "A:29": 0.935,
+    "A:30": 1.037,
+    "A:31": 0.922,
+    "A:32": 0.872,
+    "A:33": 0.846,
+    "A:34": 0.9550000000000001,
+    "A:35": 1.176,
+    "A:36": 1.141,
+    "A:37": 1.104,
+    "A:38": 1.077,
+    "A:39": 1.0879999999999999,
+    "A:40": 1.079,
+    "A:41": 1.041,
+    "A:42": 1.0390000000000001,
+    "A:43": 1.008,
+    "A:44": 1.156,
+    "A:45": 1.073,
+    "A:46": 1.2839999999999998,
+    "A:47": 1.226,
+    "A:48": 1.055,
+    "A:49": 1.109,
+    "A:50": 0.9710000000000001,
+    "A:51": 0.974,
+    "A:52": 0.979,
+    "A:53": 0.967,
+    "A:54": 0.915,
+    "A:55": 0.9909999999999999,
+    "A:56": 0.9750000000000001,
+    "A:57": 0.939,
+    "A:58": 0.915,
+    "A:59": 0.8089999999999999,
+    "A:60": 0.838,
+    "A:61": 0.8200000000000001,
+    "A:62": 0.8200000000000001,
+    "A:63": 0.922,
+    "A:64": 0.9099999999999999,
+    "A:65": 1.001,
+    "A:66": 1.154,
+    "A:67": 1.0190000000000001,
+    "A:68": 1.134,
+    "A:69": 1.191,
+    "A:70": 1.574,
+    "A:71": 2.5519999999999996,
+    "A:72": 2.656,
+    "A:73": 1.7599999999999998,
+    "A:74": 1.361,
+    "A:75": 1.2389999999999999,
+    "A:76": 1.3639999999999999,
+    "A:77": 1.439,
+    "A:78": 1.7449999999999999,
+    "A:79": 2.0749999999999997,
+    "A:80": 1.8310000000000002,
+    "A:81": 1.442,
+    "A:82": 1.163,
+    "A:83": 1.113,
+    "A:84": 0.994,
+    "A:85": 0.98,
+    "A:86": 0.916,
+    "A:87": 0.978,
+    "A:88": 1.028,
+    "A:89": 1.101,
+    "A:90": 1.299,
+    "A:91": 1.615,
+    "A:92": 1.7979999999999998,
+    "A:93": 1.3519999999999999,
+    "A:94": 1.035,
+    "A:95": 0.877,
+    "A:96": 0.911,
+    "A:97": 0.861,
+    "A:98": 0.791,
+    "A:99": 0.7829999999999999,
+    "A:100": 0.8200000000000001,
+    "A:101": 0.829,
+    "A:102": 0.927,
+    "A:103": 0.891,
+    "A:104": 0.9660000000000001,
+    "A:105": 1.18,
+    "A:106": 1.551,
+    "A:107": 1.916,
+    "A:108": 1.7169999999999999,
+    "A:109": 1.253,
+    "A:110": 1.038,
+    "A:111": 0.999,
+    "A:112": 0.871,
+    "A:113": 0.843,
+    "A:114": 0.774,
+    "A:115": 0.8400000000000001,
+    "A:116": 0.902,
+    "A:117": 0.881,
+    "A:118": 0.927,
+    "A:119": 1.081,
+    "A:120": 1.147,
+    "A:121": 1.01,
+    "A:122": 1.02,
+    "A:123": 0.8740000000000001,
+    "A:124": 0.8740000000000001,
+    "A:125": 0.8840000000000001,
+    "A:126": 0.896,
+    "A:127": 0.877,
+    "A:128": 1.08,
+    "A:129": 1.159,
+    "A:130": 1.583,
+    "A:131": 2.146,
+    "A:132": 2.191,
+    "A:133": 1.8890000000000002,
+    "A:134": 1.4569999999999999,
+    "A:135": 1.095,
+    "A:136": 0.993,
+    "A:137": 0.8029999999999999,
+    "A:138": 1.0630000000000002,
+    "A:139": 1.01,
+    "A:140": 0.7879999999999999,
+    "A:141": 0.8640000000000001,
+    "A:142": 0.8400000000000001,
+    "A:143": 0.979,
+    "A:144": 1.2,
+    "A:145": 1.21,
+    "A:146": 1.568,
+    "A:147": 1.177,
+    "A:148": 1.109,
+    "A:149": 1.104,
+    "A:150": 0.963,
+    "A:151": 0.868,
+    "A:152": 0.7779999999999999,
+    "A:153": 0.867,
+    "A:154": 0.9750000000000001,
+    "A:155": 0.751,
+    "A:156": 0.781,
+    "A:157": 0.73,
+    "A:158": 0.683,
+    "A:159": 0.591,
+    "A:160": 0.634,
+    "A:161": 0.6279999999999999,
+    "A:162": 0.597,
+    "A:163": 0.72,
+    "A:164": 0.7000000000000001,
+    "A:165": 0.692,
+    "A:166": 0.7630000000000001,
+    "A:167": 0.858,
+    "A:168": 0.8640000000000001,
+    "A:169": 0.8119999999999999,
+    "A:170": 0.94,
+    "A:171": 1.0150000000000001,
+    "A:172": 0.96,
+    "A:173": 1.047,
+    "A:174": 1.233,
+    "A:175": 1.3450000000000002,
+    "A:176": 1.301,
+    "A:177": 1.191,
+    "A:178": 1.047,
+    "A:179": 0.9909999999999999,
+    "A:180": 0.962,
+    "A:181": 0.843,
+    "A:182": 0.839,
+    "A:183": 0.916,
+    "A:184": 0.903,
+    "A:185": 0.7889999999999999,
+    "A:186": 0.79,
+    "A:187": 0.949,
+    "A:188": 1.093,
+    "A:189": 0.988,
+    "A:190": 0.953,
+    "A:191": 1.225,
+    "A:192": 1.402,
+    "A:193": 1.32,
+    "A:194": 1.3719999999999999,
+    "A:195": 2.2159999999999997,
+    "A:196": 4.0600000000000005,
+    "B:1": 4.513,
+    "B:2": 4.0920000000000005,
+    "B:3": 3.422,
+    "B:4": 3.115,
+    "B:5": 3.13,
+    "B:6": 2.7700000000000005,
+    "B:7": 2.142,
+    "B:8": 2.121,
+    "B:9": 2.277,
+    "B:10": 1.906,
+    "B:11": 1.4969999999999999,
+    "B:12": 1.6470000000000002,
+    "B:13": 1.5379999999999998,
+    "B:14": 1.154,
+    "B:15": 1.008,
+    "B:16": 1.263,
+    "B:17": 1.148,
+    "B:18": 0.875,
+    "B:19": 1.0539999999999998,
+    "B:20": 1.252,
+    "B:21": 1.09,
+    "B:22": 1.014,
+    "B:23": 1.272,
+    "B:24": 1.3769999999999998,
+    "B:25": 1.353,
+    "B:26": 1.293,
+    "B:27": 1.524,
+    "B:28": 1.479,
+    "B:29": 1.6039999999999999,
+    "B:30": 1.313,
+    "B:31": 1.1360000000000001,
+    "B:32": 1.289,
+    "B:33": 1.2770000000000001,
+    "B:34": 1.071,
+    "B:35": 1.087,
+    "B:36": 1.2839999999999998,
+    "B:37": 1.2,
+    "B:38": 1.053,
+    "B:39": 1.255,
+    "B:40": 1.444,
+    "B:41": 1.315,
+    "B:42": 1.2489999999999999,
+    "B:43": 1.613,
+    "B:44": 1.7169999999999999,
+    "B:45": 1.5659999999999998,
+    "B:46": 1.7349999999999999,
+    "B:47": 2.116,
+    "B:48": 2.185,
+    "B:49": 2.27,
+    "B:50": 2.699,
+    "B:51": 3.016,
+    "B:52": 3.366,
+    "B:53": 3.544,
+    "B:54": 4.067,
+    "B:55": 3.498,
+    "B:56": 2.822,
+    "B:57": 2.171,
+    "B:58": 2.4909999999999997,
+    "B:59": 1.9969999999999999,
+    "B:60": 2.0060000000000002,
+    "B:61": 2.374,
+    "B:62": 2.255,
+    "B:63": 1.6680000000000001,
+    "B:64": 2.118,
+    "B:65": 1.8820000000000001,
+    "B:66": 1.125,
+    "B:67": 1.326,
+    "B:68": 1.311,
+    "B:69": 1.047,
+    "B:70": 1.079,
+    "B:71": 1.424,
+    "B:72": 1.341,
+    "B:73": 1.143,
+    "B:74": 1.5260000000000002,
+    "B:75": 1.938,
+    "B:76": 2.099,
+    "B:77": 2.343,
+    "B:78": 2.878,
+    "B:79": 3.487,
+    "B:80": 3.479,
+    "B:81": 3.415,
+    "B:82": 4.271,
+    "B:83": 4.881,
+    "B:84": 4.812,
+    "B:85": 4.386,
+    "B:86": 5.19,
+    "B:87": 6.0280000000000005
+  },
+  "design_energy_gb": [
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "ARG",
+      "number": 43,
+      "energy": 0.0034304897755617035,
+      "standard_error": 0.6089250611656112
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "HIS",
+      "number": 44,
+      "energy": 0.02548631221945106,
+      "standard_error": 0.27319930836094597
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "VAL",
+      "number": 45,
+      "energy": -3.484517392518703,
+      "standard_error": 0.2331577646561109
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "GLY",
+      "number": 46,
+      "energy": -1.62662160798005,
+      "standard_error": 0.17130678859715334
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "ILE",
+      "number": 47,
+      "energy": -4.936459082294265,
+      "standard_error": 0.274316523909622
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "LEU",
+      "number": 48,
+      "energy": -5.654600774064837,
+      "standard_error": 0.23064945231554218
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "ASP",
+      "number": 49,
+      "energy": -1.1145172169576065,
+      "standard_error": 1.2538649722457402
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "PHE",
+      "number": 50,
+      "energy": -1.4700728159600998,
+      "standard_error": 0.2729655736267652
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "LYS",
+      "number": 51,
+      "energy": 0.21349482493765587,
+      "standard_error": 1.3581808505776338
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "TYR",
+      "number": 103,
+      "energy": 0.03981254264339145,
+      "standard_error": 0.2525087576184594
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "LEU",
+      "number": 105,
+      "energy": -1.05622080798005,
+      "standard_error": 0.25782065579942093
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "GLY",
+      "number": 106,
+      "energy": -0.7927157426433915,
+      "standard_error": 0.28024976747341834
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "ASP",
+      "number": 107,
+      "energy": -0.07024193117206971,
+      "standard_error": 0.7490648829520745
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "LEU",
+      "number": 108,
+      "energy": -2.212434148628429,
+      "standard_error": 0.27357423159991245
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "ASN",
+      "number": 147,
+      "energy": 0.17070486982543553,
+      "standard_error": 0.43507579893459597
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "VAL",
+      "number": 149,
+      "energy": -0.34197751620947636,
+      "standard_error": 0.23807851660284998
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "ASN",
+      "number": 150,
+      "energy": -0.8689542124688274,
+      "standard_error": 0.31860202207308347
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "HIS",
+      "number": 151,
+      "energy": -0.26070771072319215,
+      "standard_error": 0.29468362765103506
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "ILE",
+      "number": 152,
+      "energy": 0.02463840399002504,
+      "standard_error": 0.2462420064522903
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "GLY",
+      "number": 154,
+      "energy": 0.005346549625935226,
+      "standard_error": 0.18313528699862466
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "LEU",
+      "number": 155,
+      "energy": -0.33459878902743145,
+      "standard_error": 0.23731104183923807
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "SER",
+      "number": 156,
+      "energy": -2.6237070663341644,
+      "standard_error": 0.33204938920382465
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "ILE",
+      "number": 157,
+      "energy": -4.648963525187032,
+      "standard_error": 0.27135646718175715
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "LEU",
+      "number": 158,
+      "energy": -6.2970771331670825,
+      "standard_error": 0.24720873674282356
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "ASP",
+      "number": 159,
+      "energy": -1.0362704698254368,
+      "standard_error": 0.5753094057967335
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "PRO",
+      "number": 160,
+      "energy": -2.9523170014962594,
+      "standard_error": 0.18881575693237324
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "ILE",
+      "number": 161,
+      "energy": -1.4499036029925185,
+      "standard_error": 0.24110990802564297
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "PHE",
+      "number": 162,
+      "energy": -1.0558346134663343,
+      "standard_error": 0.24402529720195554
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "GLY",
+      "number": 163,
+      "energy": -1.0542333486284288,
+      "standard_error": 0.1581729036865472
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "VAL",
+      "number": 164,
+      "energy": -0.5848907571072322,
+      "standard_error": 0.22441617906321945
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "SER",
+      "number": 166,
+      "energy": 0.010830862842892731,
+      "standard_error": 0.21690802443539134
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "ASP",
+      "number": 167,
+      "energy": 0.1680172927680802,
+      "standard_error": 0.6026159962848557
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "PHE",
+      "number": 7,
+      "energy": -0.02921634713216959,
+      "standard_error": 0.27587107334249833
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "LEU",
+      "number": 11,
+      "energy": -0.39967242693266836,
+      "standard_error": 0.2506599664433317
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "GLU",
+      "number": 14,
+      "energy": -0.11335730673316669,
+      "standard_error": 1.3219704314610878
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "LEU",
+      "number": 15,
+      "energy": -0.3967597805486284,
+      "standard_error": 0.24990857895821658
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "LYS",
+      "number": 17,
+      "energy": 0.22848591521196954,
+      "standard_error": 1.1859098954128588
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "ILE",
+      "number": 18,
+      "energy": -3.716886743142145,
+      "standard_error": 0.251606154626901
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "ARG",
+      "number": 21,
+      "energy": -5.160341482294267,
+      "standard_error": 0.8137353437174377
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "LEU",
+      "number": 22,
+      "energy": -2.103170427930175,
+      "standard_error": 0.24649680565950022
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "LEU",
+      "number": 23,
+      "energy": 0.030658372069825326,
+      "standard_error": 0.24206390779882345
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "MET",
+      "number": 24,
+      "energy": -1.9132016997506234,
+      "standard_error": 0.2631415434125558
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "VAL",
+      "number": 25,
+      "energy": -2.912428955610973,
+      "standard_error": 0.2267566148253305
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "PHE",
+      "number": 26,
+      "energy": -3.081444400997506,
+      "standard_error": 0.27640669554009484
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "ASP",
+      "number": 27,
+      "energy": 0.30865586034912723,
+      "standard_error": 0.8743235357338003
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "GLU",
+      "number": 29,
+      "energy": 0.21444820349127205,
+      "standard_error": 0.59923373659755
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "ARG",
+      "number": 30,
+      "energy": -6.05878300448878,
+      "standard_error": 0.909182006673938
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "VAL",
+      "number": 31,
+      "energy": -0.43368806184538666,
+      "standard_error": 0.23034553363644317
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "GLU",
+      "number": 32,
+      "energy": 0.036349127182044784,
+      "standard_error": 1.2519093950228342
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "GLU",
+      "number": 33,
+      "energy": -0.12319663042394095,
+      "standard_error": 1.2671339454388482
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "TYR",
+      "number": 34,
+      "energy": -2.936317913216958,
+      "standard_error": 0.26175038882919116
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "MET",
+      "number": 35,
+      "energy": -0.20544306234413967,
+      "standard_error": 0.2533779545063778
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "ILE",
+      "number": 37,
+      "energy": -0.9476858234413964,
+      "standard_error": 0.27276553337440057
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "MET",
+      "number": 38,
+      "energy": -0.9687872598503741,
+      "standard_error": 0.22305338101418615
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "ILE",
+      "number": 42,
+      "energy": -0.29953914214463834,
+      "standard_error": 0.24971766010436308
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "ILE",
+      "number": 45,
+      "energy": -0.0455187032418953,
+      "standard_error": 0.24793059970111644
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "PRO",
+      "number": 60,
+      "energy": -0.33771078503740626,
+      "standard_error": 0.2233012530520194
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "PRO",
+      "number": 61,
+      "energy": -1.1466924069825437,
+      "standard_error": 0.3065849798047332
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "GLY",
+      "number": 62,
+      "energy": -0.534825472319202,
+      "standard_error": 0.2267524299969958
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "MET",
+      "number": 63,
+      "energy": -1.9297429506234414,
+      "standard_error": 0.23762956219690418
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "GLU",
+      "number": 64,
+      "energy": 0.4149525925187039,
+      "standard_error": 1.3092393316451936
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "TRP",
+      "number": 65,
+      "energy": -3.0203103261845388,
+      "standard_error": 0.3082805768575034
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "PHE",
+      "number": 66,
+      "energy": -1.4086872758104738,
+      "standard_error": 0.24708956930607492
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "GLU",
+      "number": 68,
+      "energy": 1.0125854304239406,
+      "standard_error": 1.144534213083521
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "ASN",
+      "number": 69,
+      "energy": -1.617604774064837,
+      "standard_error": 0.32270301384142047
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "PHE",
+      "number": 70,
+      "energy": -0.9342735122194513,
+      "standard_error": 0.2502677742933918
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "LEU",
+      "number": 71,
+      "energy": -0.03698753117206987,
+      "standard_error": 0.28562039234498215
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "ARG",
+      "number": 72,
+      "energy": -0.20818664339152262,
+      "standard_error": 1.078284554648808
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "TYR",
+      "number": 73,
+      "energy": -2.535823537157107,
+      "standard_error": 0.36797217905329627
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "TYR",
+      "number": 74,
+      "energy": -0.08687019052369091,
+      "standard_error": 0.3669689679456684
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "TYR",
+      "number": 76,
+      "energy": -0.4654891172069826,
+      "standard_error": 0.4355767298511916
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "GLU",
+      "number": 77,
+      "energy": 0.27598538254364047,
+      "standard_error": 1.3287645325821342
+    }
+  ],
+  "design_energy_pb": [
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "ARG",
+      "number": 43,
+      "energy": -0.5710523690773075,
+      "standard_error": 0.606128988111025
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "HIS",
+      "number": 44,
+      "energy": 0.2937855361596007,
+      "standard_error": 0.27383502583006314
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "VAL",
+      "number": 45,
+      "energy": -2.582543640897756,
+      "standard_error": 0.23283439762347963
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "GLY",
+      "number": 46,
+      "energy": -1.0510224438902742,
+      "standard_error": 0.17278131582705442
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "ILE",
+      "number": 47,
+      "energy": -3.837882793017456,
+      "standard_error": 0.2728772451106485
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "LEU",
+      "number": 48,
+      "energy": -4.832491271820449,
+      "standard_error": 0.2294517491787855
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "ASP",
+      "number": 49,
+      "energy": -0.9024688279301754,
+      "standard_error": 1.2547000278295541
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "PHE",
+      "number": 50,
+      "energy": -0.9505885286783042,
+      "standard_error": 0.2789521781698683
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "LYS",
+      "number": 51,
+      "energy": -0.4118154613466335,
+      "standard_error": 1.3611810874093788
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "TYR",
+      "number": 103,
+      "energy": -0.06316708229426445,
+      "standard_error": 0.25434897308819315
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "LEU",
+      "number": 105,
+      "energy": -0.1735037406483791,
+      "standard_error": 0.26130734123865246
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "GLY",
+      "number": 106,
+      "energy": -0.8767605985037407,
+      "standard_error": 0.29130014045567854
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "ASP",
+      "number": 107,
+      "energy": -0.22973316708229402,
+      "standard_error": 0.7546607666173755
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "LEU",
+      "number": 108,
+      "energy": -2.0537331670822945,
+      "standard_error": 0.27391141845329015
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "ASN",
+      "number": 147,
+      "energy": -0.05814713216957707,
+      "standard_error": 0.431332194090771
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "VAL",
+      "number": 149,
+      "energy": -0.48659102244389024,
+      "standard_error": 0.24102114161872898
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "ASN",
+      "number": 150,
+      "energy": -1.033511221945137,
+      "standard_error": 0.3216466043486003
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "HIS",
+      "number": 151,
+      "energy": -0.29462842892768093,
+      "standard_error": 0.29755409940369815
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "ILE",
+      "number": 152,
+      "energy": -0.13863092269326674,
+      "standard_error": 0.24915172525317023
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "GLY",
+      "number": 154,
+      "energy": 0.07153615960099757,
+      "standard_error": 0.1854828957889387
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "LEU",
+      "number": 155,
+      "energy": -0.642064837905237,
+      "standard_error": 0.2381684143897466
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "SER",
+      "number": 156,
+      "energy": -1.8937955112219451,
+      "standard_error": 0.3342644089250234
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "ILE",
+      "number": 157,
+      "energy": -3.375665835411471,
+      "standard_error": 0.2712358154794856
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "LEU",
+      "number": 158,
+      "energy": -4.702022443890274,
+      "standard_error": 0.24780223497374843
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "ASP",
+      "number": 159,
+      "energy": 3.7590448877805485,
+      "standard_error": 0.5964931544747468
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "PRO",
+      "number": 160,
+      "energy": -2.0899650872817954,
+      "standard_error": 0.18839880283550398
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "ILE",
+      "number": 161,
+      "energy": -1.6845610972568579,
+      "standard_error": 0.24065476736435648
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "PHE",
+      "number": 162,
+      "energy": -0.741910224438903,
+      "standard_error": 0.24308286550303806
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "GLY",
+      "number": 163,
+      "energy": -0.21372319201995005,
+      "standard_error": 0.16099038666068038
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "VAL",
+      "number": 164,
+      "energy": -0.5423765586034914,
+      "standard_error": 0.2235222046310628
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "SER",
+      "number": 166,
+      "energy": -0.02529675810473819,
+      "standard_error": 0.2188210906204801
+    },
+    {
+      "group": "R",
+      "chain": "A",
+      "residue_name": "ASP",
+      "number": 167,
+      "energy": 0.2959276807980057,
+      "standard_error": 0.5995995975699188
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "PHE",
+      "number": 7,
+      "energy": -0.04569326683291769,
+      "standard_error": 0.27517049872038046
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "LEU",
+      "number": 11,
+      "energy": -0.35214713216957616,
+      "standard_error": 0.24963165870570939
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "GLU",
+      "number": 14,
+      "energy": 0.5882842892768079,
+      "standard_error": 1.3454953170234556
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "LEU",
+      "number": 15,
+      "energy": -0.32015461346633406,
+      "standard_error": 0.24921163514877756
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "LYS",
+      "number": 17,
+      "energy": -1.1212543640897765,
+      "standard_error": 1.173229289117187
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "ILE",
+      "number": 18,
+      "energy": -3.1354812967581047,
+      "standard_error": 0.25051432207847435
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "ARG",
+      "number": 21,
+      "energy": -5.910596009975063,
+      "standard_error": 0.8128919569814662
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "LEU",
+      "number": 22,
+      "energy": -1.8689700748129678,
+      "standard_error": 0.24540718684306276
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "LEU",
+      "number": 23,
+      "energy": -0.23727182044887782,
+      "standard_error": 0.2412028211728035
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "MET",
+      "number": 24,
+      "energy": -1.4109152119700747,
+      "standard_error": 0.26277899544372313
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "VAL",
+      "number": 25,
+      "energy": -2.56628927680798,
+      "standard_error": 0.2250493910800616
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "PHE",
+      "number": 26,
+      "energy": -2.688124688279302,
+      "standard_error": 0.2786922478335372
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "ASP",
+      "number": 27,
+      "energy": 0.35562842892767943,
+      "standard_error": 0.8890013595823312
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "GLU",
+      "number": 29,
+      "energy": 0.6174962593516207,
+      "standard_error": 0.6006565249508357
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "ARG",
+      "number": 30,
+      "energy": -4.505009975062345,
+      "standard_error": 0.9104832343130441
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "VAL",
+      "number": 31,
+      "energy": -0.4436309226932668,
+      "standard_error": 0.22887802889689832
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "GLU",
+      "number": 32,
+      "energy": 0.45377556109725664,
+      "standard_error": 1.2634613862852215
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "GLU",
+      "number": 33,
+      "energy": 0.38864588528678284,
+      "standard_error": 1.273294556118444
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "TYR",
+      "number": 34,
+      "energy": -0.7924613466334163,
+      "standard_error": 0.26036715197793237
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "MET",
+      "number": 35,
+      "energy": -0.31131920199501256,
+      "standard_error": 0.2566955602421366
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "ILE",
+      "number": 37,
+      "energy": -0.7612817955112218,
+      "standard_error": 0.2726620082951853
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "MET",
+      "number": 38,
+      "energy": -0.8415785536159601,
+      "standard_error": 0.2206662659874402
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "ILE",
+      "number": 42,
+      "energy": -0.24691770573566074,
+      "standard_error": 0.24821571380979696
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "ILE",
+      "number": 45,
+      "energy": -0.0012568578553616397,
+      "standard_error": 0.24736975310767323
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "PRO",
+      "number": 60,
+      "energy": -0.4965536159600996,
+      "standard_error": 0.22155869732537378
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "PRO",
+      "number": 61,
+      "energy": -0.695486284289277,
+      "standard_error": 0.3032338574022857
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "GLY",
+      "number": 62,
+      "energy": -0.07546882793017452,
+      "standard_error": 0.2317973266500492
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "MET",
+      "number": 63,
+      "energy": -1.8851820448877805,
+      "standard_error": 0.23575911991589793
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "GLU",
+      "number": 64,
+      "energy": 0.7598079800498755,
+      "standard_error": 1.3123037969334934
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "TRP",
+      "number": 65,
+      "energy": -1.9235336658354114,
+      "standard_error": 0.3132769360562844
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "PHE",
+      "number": 66,
+      "energy": -0.7554862842892767,
+      "standard_error": 0.24723415324874004
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "GLU",
+      "number": 68,
+      "energy": 1.020960099750624,
+      "standard_error": 1.141535550273126
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "ASN",
+      "number": 69,
+      "energy": -0.20745635910224397,
+      "standard_error": 0.32163587984704556
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "PHE",
+      "number": 70,
+      "energy": -0.7863216957605985,
+      "standard_error": 0.2473437962019984
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "LEU",
+      "number": 71,
+      "energy": -0.1532269326683292,
+      "standard_error": 0.2868016364908568
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "ARG",
+      "number": 72,
+      "energy": -1.2473117206982556,
+      "standard_error": 1.0736032085781817
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "TYR",
+      "number": 73,
+      "energy": -1.8327655860349124,
+      "standard_error": 0.3660555455097289
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "TYR",
+      "number": 74,
+      "energy": -0.12091271820448893,
+      "standard_error": 0.37181028827649015
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "TYR",
+      "number": 76,
+      "energy": -0.5255361596009976,
+      "standard_error": 0.4412270522603073
+    },
+    {
+      "group": "L",
+      "chain": "B",
+      "residue_name": "GLU",
+      "number": 77,
+      "energy": 0.7726957605985034,
+      "standard_error": 1.3337727489262934
+    }
+  ],
+  "af3_characterise": {
+    "model": "#3",
+    "name": "derf7_binder2_template_free_model.cif",
+    "steps": [
+      "interface",
+      "interactions",
+      "buried_area",
+      "affinity",
+      "hotspots",
+      "confidence",
+      "interface_scores"
+    ],
+    "skipped": {},
+    "interface": {
+      "chains_a": [
+        "A"
+      ],
+      "chains_b": [
+        "B"
+      ],
+      "criterion": "heavy",
+      "cutoff": 4.5,
+      "residues_a": 20,
+      "residues_b": 21,
+      "contact_pairs": 53
+    },
+    "interactions": {
+      "salt-bridge": 1,
+      "hydrophobic": 24,
+      "pi-stacking": 1,
+      "cation-pi": 0,
+      "disulfide": 0
+    },
+    "interaction_detail": [
+      {
+        "kind": "hydrophobic",
+        "a": "VAL A:45",
+        "b": "TYR B:34",
+        "distance": 4.38,
+        "detail": "CG1\u2013CE2"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "ILE A:47",
+        "b": "TYR B:34",
+        "distance": 4.15,
+        "detail": "CD1\u2013CB"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "ILE A:47",
+        "b": "ILE B:37",
+        "distance": 4.03,
+        "detail": "CG2\u2013CD1"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "LEU A:48",
+        "b": "LEU B:22",
+        "distance": 4.11,
+        "detail": "CD1\u2013CD2"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "LEU A:48",
+        "b": "PHE B:26",
+        "distance": 3.89,
+        "detail": "CB\u2013CZ"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "LEU A:48",
+        "b": "TYR B:34",
+        "distance": 3.6,
+        "detail": "CD1\u2013CG"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "PHE A:50",
+        "b": "LEU B:22",
+        "distance": 4.09,
+        "detail": "CZ\u2013CD2"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "PHE A:50",
+        "b": "PHE B:26",
+        "distance": 3.54,
+        "detail": "CE1\u2013CE2"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "LEU A:105",
+        "b": "VAL B:25",
+        "distance": 3.96,
+        "detail": "CB\u2013CG2"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "LEU A:108",
+        "b": "MET B:24",
+        "distance": 4.2,
+        "detail": "CD1\u2013CE"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "LEU A:108",
+        "b": "VAL B:25",
+        "distance": 4.31,
+        "detail": "CB\u2013CG2"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "ILE A:157",
+        "b": "TYR B:73",
+        "distance": 3.86,
+        "detail": "CD1\u2013CB"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "LEU A:158",
+        "b": "LEU B:11",
+        "distance": 3.8,
+        "detail": "CD1\u2013CD1"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "LEU A:158",
+        "b": "ILE B:18",
+        "distance": 3.91,
+        "detail": "CB\u2013CD1"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "LEU A:158",
+        "b": "PHE B:66",
+        "distance": 4.16,
+        "detail": "CB\u2013CE2"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "LEU A:158",
+        "b": "PHE B:70",
+        "distance": 3.97,
+        "detail": "CD2\u2013CD2"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "LEU A:158",
+        "b": "TYR B:73",
+        "distance": 3.95,
+        "detail": "CD1\u2013CD1"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "PRO A:160",
+        "b": "ILE B:18",
+        "distance": 3.95,
+        "detail": "CD\u2013CG2"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "PRO A:160",
+        "b": "LEU B:22",
+        "distance": 3.85,
+        "detail": "CG\u2013CD2"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "PRO A:160",
+        "b": "TYR B:34",
+        "distance": 3.74,
+        "detail": "CG\u2013CE1"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "PRO A:160",
+        "b": "MET B:38",
+        "distance": 4.34,
+        "detail": "CD\u2013CE"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "ILE A:161",
+        "b": "LEU B:22",
+        "distance": 4.27,
+        "detail": "CG1\u2013CD2"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "ILE A:161",
+        "b": "VAL B:25",
+        "distance": 4.38,
+        "detail": "CD1\u2013CG2"
+      },
+      {
+        "kind": "hydrophobic",
+        "a": "PHE A:162",
+        "b": "TRP B:65",
+        "distance": 3.85,
+        "detail": "CD1\u2013CZ2"
+      },
+      {
+        "kind": "pi-stacking",
+        "a": "PHE A:50",
+        "b": "PHE B:26",
+        "distance": 5.02,
+        "detail": "T-shaped (85\u00b0)"
+      },
+      {
+        "kind": "salt-bridge",
+        "a": "ASP A:159",
+        "b": "ARG B:21",
+        "distance": 2.69,
+        "detail": "OD2\u2013NE"
+      }
+    ],
+    "buried_area": 937.5757528846134,
+    "affinity": {
+      "delta_g": -6.527537657657657,
+      "kd": 1.629615092122855e-05,
+      "temperature": 25.0
+    },
+    "hotspots": [
+      {
+        "residue": "LEU A:158",
+        "buried_area": 157.0
+      },
+      {
+        "residue": "ILE A:47",
+        "buried_area": 111.9
+      },
+      {
+        "residue": "TRP B:65",
+        "buried_area": 106.0
+      },
+      {
+        "residue": "ARG B:21",
+        "buried_area": 102.8
+      },
+      {
+        "residue": "MET B:24",
+        "buried_area": 85.3
+      },
+      {
+        "residue": "LEU A:48",
+        "buried_area": 83.8
+      },
+      {
+        "residue": "VAL B:25",
+        "buried_area": 75.1
+      },
+      {
+        "residue": "TYR B:34",
+        "buried_area": 74.4
+      },
+      {
+        "residue": "ILE A:157",
+        "buried_area": 73.5
+      },
+      {
+        "residue": "PHE B:26",
+        "buried_area": 72.2
+      }
+    ],
+    "confidence": {
+      "scale": "0-100",
+      "mean_plddt": 88.37743062093358,
+      "iplddt": 91.83108235805167,
+      "contact_pairs": 53,
+      "pdockq": 0.43636601195529406
+    },
+    "interface_scores": [
+      {
+        "chains": "A-B",
+        "ipsae": 0.6962484546205062,
+        "pdockq2": 0.7399037639795328,
+        "lis": 0.5363920575994447,
+        "iptm": 0.85,
+        "iptm_global": null
+      }
+    ]
+  },
+  "af3_confidence": {
+    "scale": "0-100",
+    "mean_plddt": 88.37743062093358,
+    "iplddt": 91.83108235805167,
+    "contact_pairs": 53,
+    "pdockq": 0.43636601195529406
+  },
+  "af3_ipsae": {
+    "A-B": {
+      "asym_ab": 0.6621155130666531,
+      "asym_ba": 0.6962484546205062,
+      "max": 0.6962484546205062,
+      "pdockq2": 0.7399037639795328,
+      "interface_plddt": 91.15850101182643,
+      "lis": 0.5363920575994447,
+      "iptm": 0.85
+    }
+  },
+  "af3_dockq": {
+    "dockq": 0.9212407049730813,
+    "fnat": 0.9206349206349206,
+    "fnonnat": 0.04918032786885246,
+    "irmsd": 0.5515500372152095,
+    "lrmsd": 1.6850215784291447,
+    "native_contacts": 63,
+    "shared_contacts": 58,
+    "interface_residues": 103,
+    "capri_class": "High",
+    "f1": 0.9354838709677418,
+    "clashes": 0
+  }
+}

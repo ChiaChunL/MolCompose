@@ -1,0 +1,24 @@
+GB/PB binding energy and per-residue decomposition for DerF7-binder2
+&general
+  sys_name="DerF7_binder2",
+  startframe=1,
+  endframe=8001,
+  interval=20,
+  PBRadii=3,
+  temperature=300.0,
+  keep_files=2,
+/
+&gb
+  igb=5,
+  saltcon=0.150,
+/
+&pb
+  istrng=0.150,
+  fillratio=4.0,
+  radiopt=0,
+/
+&decomp
+  idecomp=2,
+  dec_verbose=3,
+  print_res="within 6",
+/

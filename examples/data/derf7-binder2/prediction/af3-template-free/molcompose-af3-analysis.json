@@ -1,0 +1,63 @@
+{
+  "file_role": "Derived MolCompose analysis excerpt; not a native AlphaFold 3 output",
+  "provenance": {
+    "analysis_software": {
+      "molcompose": "0.1.3",
+      "chimerax": "1.12"
+    },
+    "analysis_report_generated_at": "2026-09-08T09:12:06+00:00",
+    "validation_record_sha256": "848f03330c6063e9cdac3a84547c22c4b86bedf1108da00e3ea1899b9332bf95",
+    "analysis_report_sha256": "a8a76e16c81e114c1c5eedceffb2df3ec06d1cd8900f61e9c51d39e8d933e1bf",
+    "extraction": "Selected numerical results from the MolCompose validation record and AF3 report; session commands and runtime metadata are not redistributed."
+  },
+  "confidence": {
+    "scale": "0-100",
+    "mean_plddt": 88.37743062093358,
+    "iplddt": 91.83108235805167,
+    "contact_pairs": 53,
+    "pdockq": 0.43636601195529406
+  },
+  "pae_interface_scores_A_B": {
+    "asym_ab": 0.6621155130666531,
+    "asym_ba": 0.6962484546205062,
+    "max": 0.6962484546205062,
+    "pdockq2": 0.7399037639795328,
+    "interface_plddt": 91.15850101182643,
+    "lis": 0.5363920575994447,
+    "iptm": 0.85
+  },
+  "interface": {
+    "chains_a": [
+      "A"
+    ],
+    "chains_b": [
+      "B"
+    ],
+    "criterion": "heavy",
+    "cutoff": 4.5,
+    "residues_a": 20,
+    "residues_b": 21,
+    "contact_pairs": 53,
+    "buried_area": 937.5757528846134
+  },
+  "reference_comparison": {
+    "reference": "PDB 9HAE",
+    "reference_file": "../../inputs/9HAE.cif",
+    "reference_file_sha256": "e150e11b25a809f1159536fd282b13bcb7abfa1911960109e66536f01216fe19",
+    "chain_map": "A:A,B:B",
+    "rmsd_units": "angstrom",
+    "metrics": {
+      "dockq": 0.9212407049730813,
+      "fnat": 0.9206349206349206,
+      "fnonnat": 0.04918032786885246,
+      "irmsd": 0.5515500372152095,
+      "lrmsd": 1.6850215784291447,
+      "native_contacts": 63,
+      "shared_contacts": 58,
+      "interface_residues": 103,
+      "capri_class": "High",
+      "f1": 0.9354838709677418,
+      "clashes": 0
+    }
+  }
+}

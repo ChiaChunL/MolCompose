@@ -1,0 +1,3 @@
+method	replicate	frames	start_ns	end_ns	energy_kcal_mol
+MM/GBSA	1	401	20	100	-82.87
+MM/PBSA	1	401	20	100	-76.22

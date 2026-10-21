@@ -1,0 +1,17 @@
+close session
+windowsize 1200 1000
+open "@CASE@/inputs/DerF7_b2.pdb"
+molcompose characterise B A model #1 distance 4.5 criterion heavy style false
+molcompose interactions model #1
+molcompose style licorice-chain model #1 labels 3
+color mc1_ifaceA #D99000 target a
+color mc1_ifaceB #7651A8 target a
+color mc1_ifaceA|mc1_ifaceB byhetero target a
+graphics silhouettes true width 3 color #4A4A4A
+camera ortho
+view matrix camera 0.92888,0.34308,0.13958,19.307,0.31806,-0.93196,0.17403,20.576,0.18979,-0.11726,-0.9748,-77.054
+clip off
+wait 1
+view #1/A,B pad 0.18
+zoom pixelSize 0.078
+molcompose export "@OUTPUT@/D1_interface.png" width 3600 height 3000 supersample 3 transparent true overwrite false saveRecipe true

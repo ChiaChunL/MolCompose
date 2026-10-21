@@ -1,0 +1,26 @@
+field	value	note
+model_identity	P1	AlphaFold 3 template-free, official rank-1
+selected_by	AF3 ranking_score	no post-hoc selection on DockQ
+seed	2066	one of three seeds 318, 1030, 2066
+sample	2	five diffusion samples per seed
+ranking_score	0.8560384195236908	highest of 15 samples (range 0.8503-0.8560)
+input_sha256	d5aa9d02e8ab0842609e31063cab93ddabb158b96eeb529617afea37948c3b70	derf7_binder2_af3.json
+templates	none	templates: [] for both chains
+run_started	2026-08-21T14:36:55+08:00	A100, alphafold3:latest container
+interface_residues_a	20	4.5 A heavy-atom criterion
+interface_residues_b	21	4.5 A heavy-atom criterion
+contact_pairs	53	MolCompose 4.5 A heavy-atom definition
+buried_area_A2	937.5757528846134	
+salt_bridges	1	
+hydrophobic_contacts	24	
+pi_stacking	1	
+prodigy_delta_g_kcal_mol	-6.527537657657657	25 C
+prodigy_kd_M	1.629615092122855e-05	25 C
+mean_plddt	88.37743062093358	0-100 scale
+iplddt	91.83108235805167	
+pdockq	0.4363660119552941	
+pdockq2	0.7399037639795328	
+ipsae	0.6962484546205062	
+lis	0.5363920575994447	
+iptm	0.85	from AF3 summary_confidences.json
+ptm	0.87	from AF3 summary_confidences.json

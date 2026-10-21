@@ -1,0 +1,17 @@
+close session
+windowsize 1200 1000
+open "@CASE@/inputs/DerF7_b2.pdb"
+open "@CASE@/inputs/derf7_binder2_template_free_model.cif"
+matchmaker #2/A to #1/A
+hide #1 models
+molcompose characterise B A model #2 distance 4.5 criterion heavy style false
+molcompose style predicted-structure model #2 labels 3
+key #FF7D45:0 #FF7D45:50 #FFDB13:50 #FFDB13:70 #65CBF3:70 #65CBF3:90 #0053D6:90 "#0053D6:100 " pos 0.22,0.20 size 0.56,0.025 fontSize 38 colorTreatment blended
+graphics silhouettes true width 3 color #4A4A4A
+camera ortho
+view matrix camera 0.92888,0.34308,0.13958,19.307,0.31806,-0.93196,0.17403,20.576,0.18979,-0.11726,-0.9748,-77.054
+clip off
+wait 1
+view #2/A,B pad 0.18
+zoom pixelSize 0.078
+molcompose export "@OUTPUT@/D2_plddt_AF3.png" width 3600 height 3000 supersample 3 transparent true overwrite false saveRecipe true

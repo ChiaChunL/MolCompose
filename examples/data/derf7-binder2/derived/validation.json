@@ -1,0 +1,37 @@
+{
+  "date": "2026-09-08",
+  "chimerax": "1.12",
+  "molcompose": "0.1.3 local release-candidate source",
+  "script": "recipes/reproduce_analysis.py",
+  "script_sha256": "05aa436c0726afbcbc0d88d053a042c79ccd68848ec6fad4272b1da017f499e2",
+  "note": "Isolated native process; only the output directory was redirected for validation. No MD/prediction rerun.",
+  "inputs_sha256": {
+    "inputs/9HAE.cif": "e150e11b25a809f1159536fd282b13bcb7abfa1911960109e66536f01216fe19",
+    "inputs/DerF7_b2.pdb": "2e0b166c52c549f7462db20145668190dd1c09b5beac13c9ecb43da1bcbf33b8",
+    "inputs/derf7_binder2.fasta": "44d9cc3a567207e54415692050530331a92f3512d2ad7013d27eb9e5b1a72356",
+    "inputs/derf7_binder2_template_free_confidences.json": "ba9b9cf4d59949f5f1c43369d14795b53d4af5bf69515f71dfb3d947411ee46f",
+    "inputs/derf7_binder2_template_free_model.cif": "438483cdf83ddc8ac277e866b28d412468900516e5ca63451208dad0ad95f4e2",
+    "inputs/derf7_binder2_template_free_summary_confidences.json": "873f51a25ffcda0301bf4addc0a8c1974eb35ac9666b58a8eea3769138203910",
+    "md/results/decomp-rep1.dat": "9b5816b4a8baf0b5bd0507a6febb1a75ec4d4d040847d11f766080f0cffdb3e2",
+    "md/results/results-rep1.dat": "5ec947dfd38e9baa12069cd29f50650695bb6c6c51629f58ca3db3b2385ccfcb",
+    "md/results/rmsf-rep1.xvg": "e0ab0ab39237496b2602f9d3e9b2e40a56f3b7f292d4a09d2d9b8599be42deb3",
+    "source_data/R1_total_energy_estimates.tsv": "1da95d2c970147b6f6bc48e31a5a359a786b4be9054948233ad1b0a5d0f3f0f6",
+    "source_data/Table_S1_R1.tsv": "78aadac5242aa07b6da7060eda585de4fb5cc34a18603999a35042833917c5bd",
+    "source_data/Table_S1_with_mutations.tsv": "bc0dcef11080ddd34931871c5c3515d2e6a95c579efb18960573c96a8536c026",
+    "source_data/design_dsasa.tsv": "a80746b3f5605b880860409d7517d1868939e9fd68f230277748cbb3b73c0bd9",
+    "source_data/pythia_ppi_all_mutations.csv": "266097e396173c1a7251bf3fe30d4844716e14402f2f51739a5eab298397702b",
+    "source_data/reference_agreement_9HAE.tsv": "6f0f278aed4f558499f673cfb07124cf7ac6b389e9a1d91ea351edd8d4b8d9c0",
+    "source_data/source_S1A_R1_rmsf.tsv": "615567c27846424bae9364ba415d75b59aa08746a7469972da0b063cd0a047c5",
+    "source_data/source_contact_53_pairs.tsv": "176eed946d4f78a71a0829d9d189398a7a4dadbab77392de22084cf5a31e3b7c",
+    "source_data/source_contact_all_residue_pairs.tsv": "3f1a557304589cfd27b2982d768569564619761adde4a3c5e5b887073ecaf8a3",
+    "source_data/source_contact_matrix.tsv": "39a81fc50625d0b7bd65f31de3e87bebb96c14deb04fcab76a1e5491e76797b7",
+    "source_data/source_energy_R1_GB_PB.tsv": "396f34d0ce44ebc0cd4bcf55e614c1d3b516fbd457e9dbd01450bbf95cb34a83"
+  },
+  "validation": {
+    "interface_residues": 42,
+    "contact_pairs": 53,
+    "interface_mutations": 798,
+    "mean_interface_rmsf_A": 1.1342380952380953,
+    "mapped_GB_PB_residues_checked": 42
+  }
+}

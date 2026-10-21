@@ -1,0 +1,19 @@
+close session
+windowsize 1200 1000
+open "@CASE@/inputs/DerF7_b2.pdb"
+molcompose characterise B A model #1 distance 4.5 criterion heavy style false
+molcompose interactions model #1
+molcompose energy "@CASE@/md/results/decomp-rep1.dat" model #1 chains A:A,B:B top 10 solvation pb
+molcompose style paratope-closeup model #1 labels 3 rankBy energy
+molcompose color by mmpbsa model #1 scope interface
+key pos 0.32,0.20 size 0.36,0.025 fontSize 38 colorTreatment blended numericLabelSpacing equal
+graphics silhouettes true width 3 color #4A4A4A
+camera ortho
+view matrix camera 0.92888,0.34308,0.13958,19.307,0.31806,-0.93196,0.17403,20.576,0.18979,-0.11726,-0.9748,-77.054
+clip off
+wait 1
+view #1/A,B pad 0.18
+zoom pixelSize 0.078
+wait 2
+molcompose export "@OUTPUT@/D5_mmpbsa_R1.png" width 3600 height 3000 supersample 3 transparent true overwrite false saveRecipe true
+wait 2

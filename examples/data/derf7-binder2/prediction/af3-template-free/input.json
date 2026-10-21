@@ -1,0 +1,22 @@
+{
+  "name": "derf7_binder2_template_free",
+  "modelSeeds": [318, 1030, 2066],
+  "sequences": [
+    {
+      "protein": {
+        "id": "A",
+        "sequence": "DPIHYDKITEEINKAIDDAIAAIEQSETIDPMKVPDHADKFERHVGILDFKGELAMRNIEARGLKQMKRQGDANVKGEEGIVKAHLLIGVHDDIVSMEYDLAYKLGDLHPTTHVISDIQDFVVALSLEIPDEGNITMTSFEVRQFANVVNHIGGLSILDPIFGVLSDVLTAIFQDTVRKEMTKVLAPAFKRELEKN",
+        "templates": []
+      }
+    },
+    {
+      "protein": {
+        "id": "B",
+        "sequence": "SPKEEKFKKKLEEELKKIRERLLMVFDEERVEEYMKIMKEVIEKILENRKKGSKEKVEIPPGMEWFYENFLRYYDYEEEKLEKEEKE",
+        "templates": []
+      }
+    }
+  ],
+  "dialect": "alphafold3",
+  "version": 4
+}

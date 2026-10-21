@@ -1,0 +1,17 @@
+close session
+windowsize 1200 1000
+open "@CASE@/inputs/DerF7_b2.pdb"
+molcompose characterise B A model #1 distance 4.5 criterion heavy style false
+molcompose interactions model #1
+molcompose hotspots model #1 minArea 0 top 0
+molcompose style surface-translucent model #1 labels 3
+molcompose color by dsasa model #1 scope interface
+key #FEE5D9:0 #FCAE91:32 #FB6A4A:64 #DE2D26:96 "#A50F15:128 " pos 0.32,0.20 size 0.36,0.025 fontSize 38 colorTreatment blended
+graphics silhouettes true width 3 color #4A4A4A
+camera ortho
+view matrix camera 0.92888,0.34308,0.13958,19.307,0.31806,-0.93196,0.17403,20.576,0.18979,-0.11726,-0.9748,-77.054
+clip off
+wait 1
+view #1/A,B pad 0.18
+zoom pixelSize 0.078
+molcompose export "@OUTPUT@/D3_dsasa.png" width 3600 height 3000 supersample 3 transparent true overwrite false saveRecipe true
