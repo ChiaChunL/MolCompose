@@ -1,9 +1,13 @@
-# case-derf7-binder2/
+# Der f 7–binder2 case
 
 Der f 7–binder2 is the designed-binder case reported in the MolCompose
 Application Note. `DerF7_b2.pdb` is the BindCraft authors' deposited model
 from https://doi.org/10.5281/zenodo.14249738, used here as an external input.
 The structural comparison uses PDB 9HAE.
+
+> **Archived copy (all versions):** <https://doi.org/10.5281/zenodo.22047283>,
+> file `molcompose-case-derf7-binder2-0.1.3.tar.gz`. The same files are in the
+> MolCompose repository under `examples/data/derf7-binder2/`.
 
 - `inputs/` — design PDB, sequences, 9HAE CIF, selected AF3 model and matching
   confidence/summary JSONs.
@@ -25,9 +29,16 @@ against 9HAE are 0.9014969620 and 0.9212407050. The design interface has
 the MM/GBSA and MM/PBSA total estimates are −82.87 and −76.22 kcal/mol.
 See the source-data and MD READMEs for units, mappings and definitions.
 
-## Replay
+## Quick start
 
-With MolCompose installed, use a **new, empty ChimeraX session**:
+With MolCompose installed, use a **new, empty ChimeraX session**. From the
+root of a clone of the MolCompose repository:
+
+```text
+open examples/data/derf7-binder2/recipes/reproduce_analysis.py
+```
+
+From the unpacked Zenodo archive, use its directory instead:
 
 ```text
 open /path/to/case-derf7-binder2/recipes/reproduce_analysis.py
@@ -40,7 +51,7 @@ results; it does not rerun MD or AF3. The analysis was tested with ChimeraX
 To render individual molecular panels in a new graphical session:
 
 ```text
-open /path/to/case-derf7-binder2/recipes/render_structure_panels.py
+open examples/data/derf7-binder2/recipes/render_structure_panels.py
 ```
 
 The templates use run1 for RMSF/PB decomposition and compare only with 9HAE.
@@ -48,6 +59,9 @@ They reset the disposable session and write to a unique output directory.
 The portable wrapper was statically checked in this refresh, not rerun
 graphically. Final manual Figure 1 composition is outside its scope.
 No Figure S1 image or plotting script is included.
+
+To run the analyses one command at a time, see the step-by-step commands in
+the repository's `examples/README.md`.
 
 ## Scope and terms
 
